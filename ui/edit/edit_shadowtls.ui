@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EditShadowTLS</class>
+ <widget class="QWidget" name="EditShadowTLS">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string notr="true">EditShadowTLS</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QGridLayout" name="authentication">
+     <item row="0" column="0">
+      <widget class="QLabel" name="version_l">
+       <property name="text">
+        <string>Protocol Version</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="version">
+       <item>
+        <property name="text">
+         <string notr="true">1</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string notr="true">2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string notr="true">3</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="password_l">
+       <property name="text">
+        <string>Password</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="MyLineEdit" name="password"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="TLS" rowstretch="0,0,0">
+     <item row="0" column="0">
+      <widget class="QLabel" name="sni_l">
+       <property name="text">
+        <string>SNI</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="MyLineEdit" name="sni"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QCheckBox" name="disableSni">
+       <property name="text">
+        <string>Disable SNI</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="alpn_l">
+       <property name="text">
+        <string notr="true">ALPN</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="MyLineEdit" name="alpn"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="certificate_l">
+       <property name="text">
+        <string>Certificate</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QPushButton" name="certificate">
+       <property name="text">
+        <string notr="true">PushButton</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QCheckBox" name="allowInsecure">
+       <property name="text">
+        <string>Allow Insecure</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MyLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>ui/widget/MyLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>version</tabstop>
+  <tabstop>password</tabstop>
+  <tabstop>sni</tabstop>
+  <tabstop>disableSni</tabstop>
+  <tabstop>alpn</tabstop>
+  <tabstop>certificate</tabstop>
+  <tabstop>allowInsecure</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

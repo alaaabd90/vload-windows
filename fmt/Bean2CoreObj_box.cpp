@@ -225,6 +225,109 @@ namespace NekoGui_fmt {
         return result;
     }
 
+    CoreObjOutboundBuildResult AnyTLSBean::BuildCoreObjSingBox() {
+        CoreObjOutboundBuildResult result;
+
+        QJsonObject coreTlsObj{
+            {"enabled", true},
+            {"disable_sni", disableSni},
+            {"insecure", allowInsecure},
+            {"certificate", caText.trimmed()},
+            {"server_name", sni},
+        };
+        if (!alpn.trimmed().isEmpty()) coreTlsObj["alpn"] = QList2QJsonArray(alpn.split(","));
+
+        QJsonObject outbound{
+            {"type", "anytls"},
+            {"server", serverAddress},
+            {"server_port", serverPort},
+            {"password", password},
+            {"tls", coreTlsObj},
+        };
+        if (!idleSessionCheckInterval.trimmed().isEmpty()) outbound["idle_session_check_interval"] = idleSessionCheckInterval;
+        if (!idleSessionTimeout.trimmed().isEmpty()) outbound["idle_session_timeout"] = idleSessionTimeout;
+        if (minIdleSession > 0) outbound["min_idle_session"] = minIdleSession;
+
+        result.outbound = outbound;
+        return result;
+    }
+
+    CoreObjOutboundBuildResult ShadowTLSBean::BuildCoreObjSingBox() {
+        CoreObjOutboundBuildResult result;
+
+        QJsonObject coreTlsObj{
+            {"enabled", true},
+            {"disable_sni", disableSni},
+            {"insecure", allowInsecure},
+            {"certificate", caText.trimmed()},
+            {"server_name", sni},
+        };
+        if (!alpn.trimmed().isEmpty()) coreTlsObj["alpn"] = QList2QJsonArray(alpn.split(","));
+
+        QJsonObject outbound{
+            {"type", "shadowtls"},
+            {"server", serverAddress},
+            {"server_port", serverPort},
+            {"version", version},
+            {"tls", coreTlsObj},
+        };
+        if (version > 1 && !password.isEmpty()) outbound["password"] = password;
+
+        result.outbound = outbound;
+        return result;
+    }
+
+    CoreObjOutboundBuildResult SSHBean::BuildCoreObjSingBox() {
+        CoreObjOutboundBuildResult result;
+
+        QJsonObject outbound{
+            {"type", "ssh"},
+            {"server", serverAddress},
+            {"server_port", serverPort},
+            {"user", user},
+        };
+        if (!password.isEmpty()) outbound["password"] = password;
+        if (!privateKey.trimmed().isEmpty()) outbound["private_key"] = privateKey.trimmed();
+        if (!privateKeyPassphrase.isEmpty()) outbound["private_key_passphrase"] = privateKeyPassphrase;
+        if (!hostKey.trimmed().isEmpty()) outbound["host_key"] = QList2QJsonArray(hostKey.split("\n"));
+        if (!clientVersion.trimmed().isEmpty()) outbound["client_version"] = clientVersion;
+
+        result.outbound = outbound;
+        return result;
+    }
+
+    CoreObjOutboundBuildResult HysteriaBean::BuildCoreObjSingBox() {
+        CoreObjOutboundBuildResult result;
+
+        QJsonObject coreTlsObj{
+            {"enabled", true},
+            {"disable_sni", disableSni},
+            {"insecure", allowInsecure},
+            {"certificate", caText.trimmed()},
+            {"server_name", sni},
+        };
+        if (!alpn.trimmed().isEmpty()) coreTlsObj["alpn"] = QList2QJsonArray(alpn.split(","));
+
+        QJsonObject outbound{
+            {"type", "hysteria"},
+            {"server", serverAddress},
+            {"server_port", serverPort},
+            {"tls", coreTlsObj},
+        };
+        if (!authString.isEmpty()) outbound["auth_str"] = authString;
+        if (uploadMbps > 0) outbound["up_mbps"] = uploadMbps;
+        if (downloadMbps > 0) outbound["down_mbps"] = downloadMbps;
+        if (!obfs.isEmpty()) outbound["obfs"] = obfs;
+        if (!serverPorts.trimmed().isEmpty()) {
+            outbound["server_ports"] = serverPorts;
+            outbound["hop_interval"] = hopInterval;
+        }
+        if (disableMtuDiscovery) outbound["disable_mtu_discovery"] = true;
+
+        result.outbound = outbound;
+        return result;
+    }
+
     CoreObjOutboundBuildResult CustomBean::BuildCoreObjSingBox() {
         CoreObjOutboundBuildResult result;
 

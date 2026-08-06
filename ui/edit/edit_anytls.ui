@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EditAnyTLS</class>
+ <widget class="QWidget" name="EditAnyTLS">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>360</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string notr="true">EditAnyTLS</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QGridLayout" name="authentication">
+     <item row="0" column="0">
+      <widget class="QLabel" name="password_l">
+       <property name="text">
+        <string>Password</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="MyLineEdit" name="password"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="TLS" rowstretch="0,0,0">
+     <item row="0" column="0">
+      <widget class="QLabel" name="sni_l">
+       <property name="text">
+        <string>SNI</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="MyLineEdit" name="sni"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QCheckBox" name="disableSni">
+       <property name="text">
+        <string>Disable SNI</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="alpn_l">
+       <property name="text">
+        <string notr="true">ALPN</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="MyLineEdit" name="alpn"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="certificate_l">
+       <property name="text">
+        <string>Certificate</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QPushButton" name="certificate">
+       <property name="text">
+        <string notr="true">PushButton</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QCheckBox" name="allowInsecure">
+       <property name="text">
+        <string>Allow Insecure</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="idleSession">
+     <item row="0" column="0">
+      <widget class="QLabel" name="idleSessionCheckInterval_l">
+       <property name="text">
+        <string>Idle Session Check Interval</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="MyLineEdit" name="idleSessionCheckInterval">
+       <property name="placeholderText">
+        <string notr="true">30s</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="idleSessionTimeout_l">
+       <property name="text">
+        <string>Idle Session Timeout</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="MyLineEdit" name="idleSessionTimeout">
+       <property name="placeholderText">
+        <string notr="true">30s</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="minIdleSession_l">
+       <property name="text">
+        <string>Min Idle Session</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="MyLineEdit" name="minIdleSession"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MyLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>ui/widget/MyLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>password</tabstop>
+  <tabstop>sni</tabstop>
+  <tabstop>disableSni</tabstop>
+  <tabstop>alpn</tabstop>
+  <tabstop>certificate</tabstop>
+  <tabstop>allowInsecure</tabstop>
+  <tabstop>idleSessionCheckInterval</tabstop>
+  <tabstop>idleSessionTimeout</tabstop>
+  <tabstop>minIdleSession</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

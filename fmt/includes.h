@@ -9,3 +9,7 @@
 #include "NaiveBean.hpp"
 #include "QUICBean.hpp"
 #include "CustomBean.hpp"
+#include "AnyTLSBean.hpp"
+#include "ShadowTLSBean.hpp"
+#include "SSHBean.hpp"
+#include "HysteriaBean.hpp"

@@ -203,6 +203,22 @@ set(PROJECT_SOURCES
         ui/edit/edit_quic.cpp
         ui/edit/edit_quic.ui
 
+        ui/edit/edit_anytls.h
+        ui/edit/edit_anytls.cpp
+        ui/edit/edit_anytls.ui
+
+        ui/edit/edit_shadowtls.h
+        ui/edit/edit_shadowtls.cpp
+        ui/edit/edit_shadowtls.ui
+
+        ui/edit/edit_ssh.h
+        ui/edit/edit_ssh.cpp
+        ui/edit/edit_ssh.ui
+
+        ui/edit/edit_hysteria.h
+        ui/edit/edit_hysteria.cpp
+        ui/edit/edit_hysteria.ui
+
         ui/edit/edit_custom.h
         ui/edit/edit_custom.cpp
         ui/edit/edit_custom.ui

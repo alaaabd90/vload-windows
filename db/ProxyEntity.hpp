@@ -22,6 +22,14 @@ namespace NekoGui_fmt {
     class ChainBean;
 
     class LoadBalanceBean;
+
+    class AnyTLSBean;
+
+    class ShadowTLSBean;
+
+    class SSHBean;
+
+    class HysteriaBean;
 }; // namespace NekoGui_fmt
 
 namespace NekoGui {
@@ -77,6 +85,22 @@ namespace NekoGui {
 
         [[nodiscard]] NekoGui_fmt::CustomBean *CustomBean() const {
             return (NekoGui_fmt::CustomBean *) bean.get();
+        };
+
+        [[nodiscard]] NekoGui_fmt::AnyTLSBean *AnyTLSBean() const {
+            return (NekoGui_fmt::AnyTLSBean *) bean.get();
+        };
+
+        [[nodiscard]] NekoGui_fmt::ShadowTLSBean *ShadowTLSBean() const {
+            return (NekoGui_fmt::ShadowTLSBean *) bean.get();
+        };
+
+        [[nodiscard]] NekoGui_fmt::SSHBean *SSHBean() const {
+            return (NekoGui_fmt::SSHBean *) bean.get();
+        };
+
+        [[nodiscard]] NekoGui_fmt::HysteriaBean *HysteriaBean() const {
+            return (NekoGui_fmt::HysteriaBean *) bean.get();
         };
     };
 } // namespace NekoGui
