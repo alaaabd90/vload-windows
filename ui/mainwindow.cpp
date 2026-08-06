@@ -19,6 +19,7 @@
 #include "ui/material/NavDrawer.hpp"
 #include "ui/material/ConnectFab.hpp"
 #include "ui/material/StatsBar.hpp"
+#include "main/MaterialPalette.hpp"
 
 #include "3rdparty/fix_old_qt.h"
 #include "3rdparty/qrcodegen.hpp"
@@ -182,56 +183,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         runOnUiThread([=] { show_log_impl(cleanVT100String(log)); });
     };
 
-    // table UI
+    // card list UI (CardListWidget - see plan Phase 1; no column headers to
+    // sort/resize by since it's a single-column Material card list like
+    // Android's, so the old header-click-sort/column-width-persistence
+    // features have no equivalent here and are dropped rather than ported -
+    // manual drag order remains the way to arrange profiles, same as Android)
     ui->proxyListTable->callback_save_order = [=] {
         auto group = NekoGui::profileManager->CurrentGroup();
         group->order = ui->proxyListTable->order;
         group->Save();
     };
     ui->proxyListTable->refresh_data = [=](int id) { refresh_proxy_list_impl_refresh_data(id); };
-    if (auto button = ui->proxyListTable->findChild<QAbstractButton *>(QString(), Qt::FindDirectChildrenOnly)) {
-        // Corner Button
-        connect(button, &QAbstractButton::clicked, this, [=] { refresh_proxy_list_impl(-1, {GroupSortMethod::ById}); });
-    }
-    connect(ui->proxyListTable->horizontalHeader(), &QHeaderView::sectionClicked, this, [=](int logicalIndex) {
-        GroupSortAction action;
-        // 不正确的descending实现
-        if (proxy_last_order == logicalIndex) {
-            action.descending = true;
-            proxy_last_order = -1;
-        } else {
-            proxy_last_order = logicalIndex;
-        }
-        action.save_sort = true;
-        // 表头
-        if (logicalIndex == 0) {
-            action.method = GroupSortMethod::ByType;
-        } else if (logicalIndex == 1) {
-            action.method = GroupSortMethod::ByAddress;
-        } else if (logicalIndex == 2) {
-            action.method = GroupSortMethod::ByName;
-        } else if (logicalIndex == 3) {
-            action.method = GroupSortMethod::ByLatency;
-        } else {
-            return;
-        }
-        refresh_proxy_list_impl(-1, action);
-    });
-    connect(ui->proxyListTable->horizontalHeader(), &QHeaderView::sectionResized, this, [=](int logicalIndex, int oldSize, int newSize) {
-        auto group = NekoGui::profileManager->CurrentGroup();
-        if (NekoGui::dataStore->refreshing_group || group == nullptr || !group->manually_column_width) return;
-        // save manually column width
-        group->column_width.clear();
-        for (int i = 0; i < ui->proxyListTable->horizontalHeader()->count(); i++) {
-            group->column_width.push_back(ui->proxyListTable->horizontalHeader()->sectionSize(i));
-        }
-        group->column_width[logicalIndex] = newSize;
-        group->Save();
-    });
     ui->tableWidget_conn->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
     ui->tableWidget_conn->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
     ui->tableWidget_conn->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
-    ui->proxyListTable->verticalHeader()->setDefaultSectionSize(24);
 
     // search box
     ui->search->setVisible(false);
@@ -253,16 +218,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     });
     connect(ui->search, &QLineEdit::textChanged, this, [=](const QString &text) {
         if (text.isEmpty()) {
-            for (int i = 0; i < ui->proxyListTable->rowCount(); i++) {
-                ui->proxyListTable->setRowHidden(i, false);
+            for (int i = 0; i < ui->proxyListTable->count(); i++) {
+                ui->proxyListTable->item(i)->setHidden(false);
             }
         } else {
-            QList<QTableWidgetItem *> findItem = ui->proxyListTable->findItems(text, Qt::MatchContains);
-            for (int i = 0; i < ui->proxyListTable->rowCount(); i++) {
-                ui->proxyListTable->setRowHidden(i, true);
+            QList<QListWidgetItem *> findItem = ui->proxyListTable->findItems(text, Qt::MatchContains);
+            for (int i = 0; i < ui->proxyListTable->count(); i++) {
+                ui->proxyListTable->item(i)->setHidden(true);
             }
             for (auto item: findItem) {
-                if (item != nullptr) ui->proxyListTable->setRowHidden(item->row(), false);
+                if (item != nullptr) item->setHidden(false);
             }
         }
     });
@@ -554,21 +519,8 @@ void MainWindow::show_group(int gid) {
     }
     ui->tabWidget->widget(groupId2TabIndex(gid))->layout()->addWidget(ui->proxyListTable);
 
-    // 列宽是否可调
-    if (group->manually_column_width) {
-        for (int i = 0; i <= 4; i++) {
-            ui->proxyListTable->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Interactive);
-            auto size = group->column_width.value(i);
-            if (size <= 0) size = ui->proxyListTable->horizontalHeader()->defaultSectionSize();
-            ui->proxyListTable->horizontalHeader()->resizeSection(i, size);
-        }
-    } else {
-        ui->proxyListTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-        ui->proxyListTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-        ui->proxyListTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
-        ui->proxyListTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
-        ui->proxyListTable->horizontalHeader()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
-    }
+    // column-width persistence has no equivalent on a single-column card
+    // list (see the card-list migration note at the top of the constructor)
 
     // show proxies
     GroupSortAction gsa;
@@ -1027,13 +979,13 @@ void MainWindow::refresh_proxy_list_impl(const int &id, GroupSortAction groupSor
     if (id < 0) {
         // 清空数据
         ui->proxyListTable->row2Id.clear();
-        ui->proxyListTable->setRowCount(0);
+        ui->proxyListTable->clear();
         // 添加行
         int row = -1;
         for (const auto &[id, profile]: NekoGui::profileManager->profiles) {
             if (NekoGui::dataStore->current_group != profile->gid) continue;
             row++;
-            ui->proxyListTable->insertRow(row);
+            ui->proxyListTable->insertEmptyRow(row);
             ui->proxyListTable->row2Id += id;
         }
     }
@@ -1111,62 +1063,40 @@ void MainWindow::refresh_proxy_list_impl(const int &id, GroupSortAction groupSor
 }
 
 void MainWindow::refresh_proxy_list_impl_refresh_data(const int &id) {
-    // 绘制或更新item(s)
-    for (int row = 0; row < ui->proxyListTable->rowCount(); row++) {
+    // 绘制或更新item(s) - one CardItemDelegate row per profile (see plan:
+    // card-list migration), combining what used to be 5 separate table
+    // columns (Type/Address/Name/Test Result/Traffic) into the two
+    // secondary lines Android's layout_profile.xml card uses.
+    for (int row = 0; row < ui->proxyListTable->count(); row++) {
         auto profileId = ui->proxyListTable->row2Id[row];
         if (id >= 0 && profileId != id) continue; // refresh ONE item
         auto profile = NekoGui::profileManager->GetProfile(profileId);
         if (profile == nullptr) continue;
 
         auto isRunning = profileId == NekoGui::dataStore->started_id;
-        auto f0 = std::make_unique<QTableWidgetItem>();
-        f0->setData(114514, profileId);
 
-        // Check state
-        auto check = f0->clone();
-        check->setText(isRunning ? "✓" : Int2String(row + 1));
-        ui->proxyListTable->setVerticalHeaderItem(row, check);
-
-        // C0: Type
-        auto f = f0->clone();
-        f->setText(profile->bean->DisplayType());
-        if (isRunning) f->setForeground(palette().link());
-        ui->proxyListTable->setItem(row, 0, f);
-
-        // C1: Address+Port
-        f = f0->clone();
-        f->setText(profile->bean->DisplayAddress());
-        if (isRunning) f->setForeground(palette().link());
-        ui->proxyListTable->setItem(row, 1, f);
-
-        // C2: Name
-        f = f0->clone();
-        f->setText(profile->bean->name);
-        if (isRunning) f->setForeground(palette().link());
-        ui->proxyListTable->setItem(row, 2, f);
-
-        // C3: Test Result
-        f = f0->clone();
+        QString testResult;
         if (profile->full_test_report.isEmpty()) {
-            auto color = profile->DisplayLatencyColor();
-            if (color.isValid()) f->setForeground(color);
-            f->setText(profile->DisplayLatency());
+            testResult = profile->DisplayLatency();
         } else {
-            f->setText(profile->full_test_report);
+            testResult = profile->full_test_report;
         }
-        ui->proxyListTable->setItem(row, 3, f);
 
-        // C4: Traffic
-        f = f0->clone();
-        f->setText(profile->traffic_data->DisplayTraffic());
-        ui->proxyListTable->setItem(row, 4, f);
+        auto typeAndStatus = QStringLiteral("%1 · %2 · %3")
+                                 .arg(profile->bean->DisplayType(), testResult, profile->traffic_data->DisplayTraffic());
+
+        auto accent = MaterialPalette::byIndex(profile->gid).primary;
+
+        ui->proxyListTable->setRowContent(
+            row, profileId, profile->bean->name, profile->bean->DisplayAddress(),
+            typeAndStatus, QColor(accent), isRunning, /*lockedImport*/ false);
     }
 }
 
 // table菜单相关
 
-void MainWindow::on_proxyListTable_itemDoubleClicked(QTableWidgetItem *item) {
-    auto id = item->data(114514).toInt();
+void MainWindow::on_proxyListTable_itemDoubleClicked(QListWidgetItem *item) {
+    auto id = item->data(Qt::UserRole).toInt();
     if (select_mode) {
         emit profile_selected(id);
         select_mode = false;
@@ -1539,7 +1469,7 @@ QList<std::shared_ptr<NekoGui::ProxyEntity>> MainWindow::get_now_selected_list()
     auto items = ui->proxyListTable->selectedItems();
     QList<std::shared_ptr<NekoGui::ProxyEntity>> list;
     for (auto item: items) {
-        auto id = item->data(114514).toInt();
+        auto id = item->data(Qt::UserRole).toInt();
         auto ent = NekoGui::profileManager->GetProfile(id);
         if (ent != nullptr && !list.contains(ent)) list += ent;
     }

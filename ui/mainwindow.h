@@ -8,6 +8,7 @@
 
 #include <QTime>
 #include <QTableWidgetItem>
+#include <QListWidgetItem>
 #include <QKeyEvent>
 #include <QResizeEvent>
 #include <QSystemTrayIcon>
@@ -132,7 +133,7 @@ private slots:
 
     void on_menu_resolve_domain_triggered();
 
-    void on_proxyListTable_itemDoubleClicked(QTableWidgetItem *item);
+    void on_proxyListTable_itemDoubleClicked(QListWidgetItem *item);
 
     void on_proxyListTable_customContextMenuRequested(const QPoint &pos);
 
