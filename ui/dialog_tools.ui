@@ -29,6 +29,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="assets_button">
+     <property name="text">
+      <string>Route Assets</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

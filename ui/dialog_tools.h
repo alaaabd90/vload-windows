@@ -26,6 +26,8 @@ private slots:
 
     void on_backup_button_clicked();
 
+    void on_assets_button_clicked();
+
 private:
     Ui::DialogTools *ui;
 };

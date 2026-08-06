@@ -275,6 +275,10 @@ set(PROJECT_SOURCES
         ui/dialog_tools.h
         ui/dialog_tools.ui
 
+        ui/dialog_assets.cpp
+        ui/dialog_assets.h
+        ui/dialog_assets.ui
+
         ui/widget/ProxyItem.cpp
         ui/widget/ProxyItem.h
         ui/widget/ProxyItem.ui
