@@ -223,6 +223,10 @@ set(PROJECT_SOURCES
         ui/edit/edit_wireguard.cpp
         ui/edit/edit_wireguard.ui
 
+        ui/edit/edit_trojan_go.h
+        ui/edit/edit_trojan_go.cpp
+        ui/edit/edit_trojan_go.ui
+
         ui/edit/edit_custom.h
         ui/edit/edit_custom.cpp
         ui/edit/edit_custom.ui

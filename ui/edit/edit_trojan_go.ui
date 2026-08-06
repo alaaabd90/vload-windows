@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EditTrojanGo</class>
+ <widget class="QWidget" name="EditTrojanGo">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>360</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string notr="true">EditTrojanGo</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="password_l">
+       <property name="text">
+        <string>Password</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="MyLineEdit" name="password"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="sni_l">
+       <property name="text">
+        <string>SNI</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="MyLineEdit" name="sni"/>
+     </item>
+     <item row="1" column="2">
+      <widget class="QCheckBox" name="allowInsecure">
+       <property name="text">
+        <string>Allow Insecure</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="type_l">
+       <property name="text">
+        <string>Transport</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="type">
+       <item>
+        <property name="text">
+         <string notr="true">original</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string notr="true">ws</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="host_l">
+       <property name="text">
+        <string>Host</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="MyLineEdit" name="host"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="path_l">
+       <property name="text">
+        <string>Path</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="MyLineEdit" name="path"/>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="ss_method_l">
+       <property name="text">
+        <string>Encryption</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QComboBox" name="ss_method">
+       <item>
+        <property name="text">
+         <string notr="true">None</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string notr="true">aes-128-gcm</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string notr="true">aes-256-gcm</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string notr="true">chacha20-ietf-poly1305</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="ss_password_l">
+       <property name="text">
+        <string>Encryption Password</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="MyLineEdit" name="ss_password"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MyLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>ui/widget/MyLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>password</tabstop>
+  <tabstop>sni</tabstop>
+  <tabstop>allowInsecure</tabstop>
+  <tabstop>type</tabstop>
+  <tabstop>host</tabstop>
+  <tabstop>path</tabstop>
+  <tabstop>ss_method</tabstop>
+  <tabstop>ss_password</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

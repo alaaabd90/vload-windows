@@ -15,6 +15,7 @@
 #include "ui/edit/edit_ssh.h"
 #include "ui/edit/edit_hysteria.h"
 #include "ui/edit/edit_wireguard.h"
+#include "ui/edit/edit_trojan_go.h"
 
 #include "fmt/includes.h"
 #include "fmt/Preset.hpp"
@@ -127,6 +128,7 @@ DialogEditProfile::DialogEditProfile(const QString &_type, int profileOrGroupId,
         LOAD_TYPE("ssh")
         LOAD_TYPE("hysteria")
         LOAD_TYPE("wireguard")
+        LOAD_TYPE("trojan-go")
         ui->type->addItem(tr("Custom (%1 outbound)").arg(software_core_name), "internal");
         ui->type->addItem(tr("Custom (%1 config)").arg(software_core_name), "internal-full");
         ui->type->addItem(tr("Custom (Extra Core)"), "custom");
@@ -209,6 +211,10 @@ void DialogEditProfile::typeSelected(const QString &newType) {
         innerEditor = _innerWidget;
     } else if (type == "wireguard") {
         auto _innerWidget = new EditWireGuard(this);
+        innerWidget = _innerWidget;
+        innerEditor = _innerWidget;
+    } else if (type == "trojan-go") {
+        auto _innerWidget = new EditTrojanGo(this);
         innerWidget = _innerWidget;
         innerEditor = _innerWidget;
     } else if (type == "custom" || type == "internal" || type == "internal-full") {

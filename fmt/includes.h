@@ -14,3 +14,4 @@
 #include "SSHBean.hpp"
 #include "HysteriaBean.hpp"
 #include "WireGuardBean.hpp"
+#include "TrojanGoBean.hpp"
