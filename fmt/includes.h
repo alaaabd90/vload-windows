@@ -13,3 +13,4 @@
 #include "ShadowTLSBean.hpp"
 #include "SSHBean.hpp"
 #include "HysteriaBean.hpp"
+#include "WireGuardBean.hpp"

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EditWireGuard</class>
+ <widget class="QWidget" name="EditWireGuard">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>400</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string notr="true">EditWireGuard</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QGridLayout" name="localBox">
+     <item row="0" column="0">
+      <widget class="QLabel" name="localAddress_l">
+       <property name="text">
+        <string>Local Address</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="MyLineEdit" name="localAddress">
+       <property name="placeholderText">
+        <string notr="true">172.16.0.2/32</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="privateKey_l">
+       <property name="text">
+        <string>Private Key</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="MyLineEdit" name="privateKey"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="mtu_l">
+       <property name="text">
+        <string notr="true">MTU</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="MyLineEdit" name="mtu"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="peerBox">
+     <item row="0" column="0">
+      <widget class="QLabel" name="peerPublicKey_l">
+       <property name="text">
+        <string>Peer Public Key</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="MyLineEdit" name="peerPublicKey"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="preSharedKey_l">
+       <property name="text">
+        <string>Pre-shared Key</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="MyLineEdit" name="preSharedKey"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="allowedIps_l">
+       <property name="text">
+        <string>Allowed IPs</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="MyLineEdit" name="allowedIps">
+       <property name="placeholderText">
+        <string notr="true">0.0.0.0/0,::/0</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="persistentKeepalive_l">
+       <property name="text">
+        <string>Persistent Keepalive (s)</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="MyLineEdit" name="persistentKeepalive"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MyLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>ui/widget/MyLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>localAddress</tabstop>
+  <tabstop>privateKey</tabstop>
+  <tabstop>mtu</tabstop>
+  <tabstop>peerPublicKey</tabstop>
+  <tabstop>preSharedKey</tabstop>
+  <tabstop>allowedIps</tabstop>
+  <tabstop>persistentKeepalive</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

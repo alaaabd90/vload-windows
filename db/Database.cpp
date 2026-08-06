@@ -200,6 +200,8 @@ namespace NekoGui {
             bean = new NekoGui_fmt::SSHBean();
         } else if (type == "hysteria") {
             bean = new NekoGui_fmt::HysteriaBean();
+        } else if (type == "wireguard") {
+            bean = new NekoGui_fmt::WireGuardBean();
         } else {
             bean = new NekoGui_fmt::AbstractBean(-114514);
         }

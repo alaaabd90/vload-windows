@@ -429,6 +429,27 @@ namespace NekoGui {
             ent->traffic_data->tag = tagOut.toStdString();
             status->result->outboundStats += ent->traffic_data;
 
+            // WireGuard is a sing-box config-level "endpoint", not an outbound (the
+            // legacy WireGuard outbound was removed in sing-box 1.13 - see
+            // include/wireguard.go upstream). Divert it into status->endpoints using
+            // the same tag: sing-box's outbound manager transparently falls back to
+            // endpoint lookup for any tag it can't find among outbounds (adapter/
+            // outbound/manager.go), so route.final/detour/group-member references
+            // keep working unchanged. Mux/domain_strategy/custom_outbound don't apply
+            // to endpoints, so this skips straight past them. Chain-composition
+            // (detouring into/out of a WireGuard profile) isn't supported - only
+            // standalone or load-balance-member usage.
+            if (ent->type == "wireguard") {
+                if (!IsIpAddress(ent->bean->serverAddress)) {
+                    status->domainListDNSDirect += "full:" + ent->bean->serverAddress;
+                }
+                status->endpoints += outbound;
+                pastTag = tagOut;
+                pastExternalStat = thisExternalStat;
+                index++;
+                continue;
+            }
+
             // mux common
             auto needMux = ent->type == "vmess" || ent->type == "trojan" || ent->type == "vless";
             needMux &= dataStore->mux_concurrency > 0;
@@ -580,6 +601,7 @@ namespace NekoGui {
 
         status->result->coreConfig.insert("inbounds", status->inbounds);
         status->result->coreConfig.insert("outbounds", status->outbounds);
+        if (!status->endpoints.isEmpty()) status->result->coreConfig.insert("endpoints", status->endpoints);
 
         // user rule
         if (!status->forTest) {

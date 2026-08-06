@@ -328,6 +328,30 @@ namespace NekoGui_fmt {
         return result;
     }
 
+    CoreObjOutboundBuildResult WireGuardBean::BuildCoreObjSingBox() {
+        CoreObjOutboundBuildResult result;
+
+        QJsonObject peer{
+            {"address", serverAddress},
+            {"port", serverPort},
+            {"public_key", peerPublicKey},
+        };
+        if (!preSharedKey.isEmpty()) peer["pre_shared_key"] = preSharedKey;
+        if (!allowedIps.trimmed().isEmpty()) peer["allowed_ips"] = QList2QJsonArray(allowedIps.split(","));
+        if (persistentKeepalive > 0) peer["persistent_keepalive_interval"] = persistentKeepalive;
+
+        QJsonObject endpoint{
+            {"type", "wireguard"},
+            {"private_key", privateKey},
+            {"peers", QJsonArray{peer}},
+        };
+        if (!localAddress.trimmed().isEmpty()) endpoint["address"] = QList2QJsonArray(localAddress.split(","));
+        if (mtu > 0) endpoint["mtu"] = mtu;
+
+        result.outbound = endpoint;
+        return result;
+    }
+
     CoreObjOutboundBuildResult CustomBean::BuildCoreObjSingBox() {
         CoreObjOutboundBuildResult result;
 
