@@ -11,7 +11,7 @@ generate_product_version(
         COMPANY_COPYRIGHT "vload"
         FILE_DESCRIPTION "vload"
         VERSION_MAJOR 1
-        VERSION_MINOR 1
+        VERSION_MINOR 2
         VERSION_PATCH 0
 )
 add_definitions(-DUNICODE -D_UNICODE -DNOMINMAX)
