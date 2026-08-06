@@ -67,7 +67,16 @@ jobs:
           - platform: windows-2022
             arch: x64
             qt_version: "6.7"
-          - platform: ubuntu-20.04
+          # ubuntu-20.04 was deprecated and fully removed as a GitHub-hosted
+          # runner image around April 2025 - jobs targeting it queue forever
+          # since no runner can ever be assigned (confirmed: this job stayed
+          # "queued" indefinitely across every run this session, independent
+          # of the separate GitHub Actions outage that was also happening).
+          # The actual build runs entirely inside a pinned Docker container
+          # (ghcr.io/matsuridayo/debian10-qt5:20230131 - see the "Docker"
+          # steps below), so the host OS version doesn't affect the build
+          # itself; ubuntu-latest just needs to support running Docker.
+          - platform: ubuntu-latest
             arch: x64
             qt_version: "5.12"
           # Windows on ARM64 - official Qt6 LTS support since 6.8 (prebuilt
@@ -141,11 +150,11 @@ jobs:
           key: DepsCache-${{ matrix.platform }}-${{ matrix.arch }}-${{ hashFiles('libs/build_deps_*.sh') }}-Qt${{ matrix.qt_version }}
       - name: Build Dependencies
         shell: bash
-        if: steps.cache-deps.outputs.cache-hit != 'true' && matrix.platform != 'ubuntu-20.04'
+        if: steps.cache-deps.outputs.cache-hit != 'true' && matrix.platform != 'ubuntu-latest'
         run: ./libs/build_deps_all.sh
       - name: Build Dependencies (Docker)
         shell: bash
-        if: steps.cache-deps.outputs.cache-hit != 'true' && matrix.platform == 'ubuntu-20.04'
+        if: steps.cache-deps.outputs.cache-hit != 'true' && matrix.platform == 'ubuntu-latest'
         run: |
           docker run --rm \
             -v $PWD:/nekoray \
@@ -183,7 +192,7 @@ jobs:
           ./libs/deploy_windows_arm64.sh
       - name: Linux - Generate MakeFile and Build
         shell: bash
-        if: matrix.platform == 'ubuntu-20.04'
+        if: matrix.platform == 'ubuntu-latest'
         run: |
           docker run --rm \
             -v $PWD:/nekoray \
