@@ -23,6 +23,7 @@
 #include "ui/material/StatsBar.hpp"
 #include "ui/dialog_stun_test.h"
 #include "ui/dialog_about.h"
+#include "ui/dialog_tools.h"
 #include "main/MaterialPalette.hpp"
 
 #include "3rdparty/fix_old_qt.h"
@@ -146,7 +147,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
                 MessageBoxWarning(tr("Traffic"), tr("Enable the Clash API port in Basic Settings > Core first."));
             }
         } else if (itemId == "nav_tools") {
-            auto dialog = new DialogStunTest(this);
+            auto dialog = new DialogTools(this);
             dialog->setAttribute(Qt::WA_DeleteOnClose);
             dialog->show();
         } else if (itemId == "nav_about") {
