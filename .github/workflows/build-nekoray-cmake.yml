@@ -106,7 +106,15 @@ jobs:
           # (Qt restructured arm64 packaging away from the msvc2019 naming the
           # x64 job's older custom SDK still uses) - needs the matching vs2022
           # toolset, not the vs2019-era 14.2 pin used for x64.
-          arch: ${{ matrix.arch }}
+          #
+          # arch must be "x64_arm64" (cross: x64 HOST, arm64 TARGET), not bare
+          # "arm64" - windows-2022 runners are x64 machines, and bare "arm64"
+          # tells vcvarsall.bat to set up a *native* arm64-host toolchain,
+          # pointing PATH at an arm64-native clang.exe that the x64 runner
+          # can't execute at all ("This version of %1 is not compatible with
+          # the version of Windows you're running" - confirmed from the
+          # actual CI failure log for build-cpp windows-2022/arm64/6.8.1).
+          arch: x64_arm64
       # ========================================================================================================= Qt Install
       - name: Windows x64 - Download Custom Qt ${{ matrix.qt_version }} SDK
         shell: bash
