@@ -282,6 +282,15 @@ namespace NekoGui_rpc {
         }
     }
 
+    void Client::UpdateNetworkAvailability(int slot, bool available) {
+        libcore::UpdateNetworkAvailabilityReq request;
+        request.set_slot(slot);
+        request.set_available(available);
+
+        libcore::ErrorResp reply;
+        default_grpc_channel->Call("UpdateNetworkAvailability", request, &reply, 500);
+    }
+
     libcore::UpdateResp Client::Update(bool *rpcOK, const libcore::UpdateReq &request) {
         libcore::UpdateResp reply;
         auto status = default_grpc_channel->Call("Update", request, &reply);

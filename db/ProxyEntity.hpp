@@ -20,6 +20,8 @@ namespace NekoGui_fmt {
     class CustomBean;
 
     class ChainBean;
+
+    class LoadBalanceBean;
 }; // namespace NekoGui_fmt
 
 namespace NekoGui {
@@ -43,6 +45,10 @@ namespace NekoGui {
 
         [[nodiscard]] NekoGui_fmt::ChainBean *ChainBean() const {
             return (NekoGui_fmt::ChainBean *) bean.get();
+        };
+
+        [[nodiscard]] NekoGui_fmt::LoadBalanceBean *LoadBalanceBean() const {
+            return (NekoGui_fmt::LoadBalanceBean *) bean.get();
         };
 
         [[nodiscard]] NekoGui_fmt::SocksHttpBean *SocksHTTPBean() const {

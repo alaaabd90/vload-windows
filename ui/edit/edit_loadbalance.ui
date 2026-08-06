@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EditLoadBalance</class>
+ <widget class="QWidget" name="EditLoadBalance">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>420</width>
+    <height>280</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string notr="true">EditLoadBalance</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="slotABox">
+     <property name="title">
+      <string>Network A</string>
+     </property>
+     <layout class="QVBoxLayout" name="slotALayout">
+      <item>
+       <layout class="QHBoxLayout" name="slotAProfileLayout">
+        <item>
+         <widget class="QLabel" name="profile_name_a">
+          <property name="text">
+           <string>(no profile selected)</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="select_profile_a">
+          <property name="text">
+           <string>Select Profile</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="slotAAdapterLayout">
+        <item>
+         <widget class="QLabel" name="adapter_a_l">
+          <property name="text">
+           <string>Network Adapter</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="adapter_a"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="slotBBox">
+     <property name="title">
+      <string>Network B</string>
+     </property>
+     <layout class="QVBoxLayout" name="slotBLayout">
+      <item>
+       <layout class="QHBoxLayout" name="slotBProfileLayout">
+        <item>
+         <widget class="QLabel" name="profile_name_b">
+          <property name="text">
+           <string>(no profile selected)</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="select_profile_b">
+          <property name="text">
+           <string>Select Profile</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="slotBAdapterLayout">
+        <item>
+         <widget class="QLabel" name="adapter_b_l">
+          <property name="text">
+           <string>Network Adapter</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="adapter_b"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="hint_label">
+     <property name="text">
+      <string>Traffic is automatically balanced across both networks based on their real, live performance - nothing to configure. If one network drops or starts failing, traffic reroutes to the other.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

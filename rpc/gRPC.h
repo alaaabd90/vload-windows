@@ -32,6 +32,8 @@ namespace NekoGui_rpc {
 
         libcore::UpdateResp Update(bool *rpcOK, const libcore::UpdateReq &request);
 
+        void UpdateNetworkAvailability(int slot, bool available);
+
     private:
         std::function<std::unique_ptr<QtGrpc::Http2GrpcChannelPrivate>()> make_grpc_channel;
         std::unique_ptr<QtGrpc::Http2GrpcChannelPrivate> default_grpc_channel;

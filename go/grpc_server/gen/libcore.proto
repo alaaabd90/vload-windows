@@ -12,6 +12,12 @@ service LibcoreService {
   rpc Test(TestReq) returns (TestResp) {}
   rpc QueryStats(QueryStatsReq) returns (QueryStatsResp) {}
   rpc ListConnections(EmptyReq) returns (ListConnectionsResp) {}
+  // vload: mark one of the two load-balance slots (0 or 1, matching the
+  // order the "weighted" outbound's members were configured in) as
+  // available or unavailable, for failover when the physical network it's
+  // bound to drops or recovers. No-op if the running config isn't using a
+  // weighted (vload load-balance) outbound.
+  rpc UpdateNetworkAvailability(UpdateNetworkAvailabilityReq) returns (ErrorResp) {}
 }
 
 message EmptyReq {}
@@ -91,4 +97,9 @@ message UpdateResp {
 
 message ListConnectionsResp {
   string nekoray_connections_json = 1;
+}
+
+message UpdateNetworkAvailabilityReq {
+  int32 slot = 1;
+  bool available = 2;
 }

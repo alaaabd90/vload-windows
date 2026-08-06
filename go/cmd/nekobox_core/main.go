@@ -8,12 +8,11 @@ import (
 	"grpc_server"
 
 	"github.com/matsuridayo/libneko/neko_common"
-	boxmain "github.com/sagernet/sing-box/cmd/sing-box"
 	"github.com/sagernet/sing-box/constant"
 )
 
 func main() {
-	fmt.Println("sing-box:", constant.Version, "NekoBox:", neko_common.Version_neko)
+	fmt.Println("sing-box:", constant.Version)
 	fmt.Println()
 
 	// nekobox_core
@@ -23,6 +22,9 @@ func main() {
 		return
 	}
 
-	// sing-box
-	boxmain.Main()
+	// this build only runs as a nekobox_core gRPC server, not as a
+	// standalone sing-box CLI (cmd/sing-box is "package main", not
+	// importable as a library in current sing-box-vload)
+	fmt.Println("usage: nekobox_core nekobox")
+	os.Exit(1)
 }

@@ -176,6 +176,8 @@ namespace NekoGui {
             bean = new NekoGui_fmt::ShadowSocksBean();
         } else if (type == "chain") {
             bean = new NekoGui_fmt::ChainBean();
+        } else if (type == "loadbalance") {
+            bean = new NekoGui_fmt::LoadBalanceBean();
         } else if (type == "vmess") {
             bean = new NekoGui_fmt::VMessBean();
         } else if (type == "trojan") {

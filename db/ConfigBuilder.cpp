@@ -147,6 +147,111 @@ namespace NekoGui {
         return chainTagOut;
     }
 
+    // vload: combine two independently-built outbounds - one per network
+    // adapter slot - under a "weighted" group (see sing-box-vload's
+    // protocol/group/weighted.go), tagged "proxy" same as the single/chain
+    // path so all downstream routing/DNS wiring is unaffected.
+    //
+    // Each slot's outbound is always built fresh (never through the
+    // "chain"-path global-hop dedup in BuildChainInternal), because the two
+    // slots can legitimately reference the very same underlying profile
+    // (vload's README explicitly documents "the same profile can be used for
+    // both") and each occurrence needs its own bind_interface.
+    //
+    // Known limitation: mux/external-core-process outbounds (naive,
+    // hysteria1, mieru, trojan-go plugins) aren't supported inside a
+    // load-balance slot yet, only profiles sing-box builds natively.
+    QString BuildLoadBalance(const std::shared_ptr<BuildConfigStatus> &status) {
+        auto lb = status->ent->LoadBalanceBean();
+
+        auto buildSlot = [&](const QString &slotName, int proxyId, const QString &adapter, QString &outTag) -> bool {
+            auto slotEnt = profileManager->GetProfile(proxyId);
+            if (slotEnt == nullptr) {
+                status->result->error = QStringLiteral("vload: load-balance slot profile not found: %1").arg(proxyId);
+                return false;
+            }
+            if (slotEnt->type == "loadbalance") {
+                status->result->error = QStringLiteral("vload: a load-balance slot cannot itself be a load-balance profile");
+                return false;
+            }
+
+            if (slotEnt->type == "chain") {
+                auto list = slotEnt->ChainBean()->list;
+                std::reverse(std::begin(list), std::end(list));
+                QList<std::shared_ptr<ProxyEntity>> ents;
+                for (auto id: list) {
+                    auto e = profileManager->GetProfile(id);
+                    if (e == nullptr) {
+                        status->result->error = QStringLiteral("vload: load-balance slot chain missing ent: %1").arg(id);
+                        return false;
+                    }
+                    if (e->type == "chain" || e->type == "loadbalance") {
+                        status->result->error = QStringLiteral("vload: nested chain/load-balance is not allowed");
+                        return false;
+                    }
+                    ents += e;
+                }
+                outTag = BuildChainInternal(slotName == "a" ? 101 : 102, ents, status);
+                if (!status->result->error.isEmpty()) return false;
+            } else {
+                const auto coreR = slotEnt->bean->BuildCoreObjSingBox();
+                if (coreR.outbound.isEmpty()) {
+                    status->result->error = "unsupported outbound";
+                    return false;
+                }
+                if (!coreR.error.isEmpty()) {
+                    status->result->error = coreR.error;
+                    return false;
+                }
+                outTag = "lb-" + slotName + "-" + Int2String(slotEnt->id);
+                auto outbound = coreR.outbound;
+                outbound["tag"] = outTag;
+                status->outbounds += outbound;
+
+                slotEnt->traffic_data->id = slotEnt->id;
+                slotEnt->traffic_data->tag = outTag.toStdString();
+                status->result->outboundStats += slotEnt->traffic_data;
+            }
+
+            if (!adapter.isEmpty()) {
+                for (int i = 0; i < status->outbounds.size(); i++) {
+                    auto obj = status->outbounds[i].toObject();
+                    if (obj["tag"].toString() == outTag) {
+                        obj["bind_interface"] = adapter;
+                        status->outbounds[i] = obj;
+                        break;
+                    }
+                }
+            }
+            return true;
+        };
+
+        QString tagA, tagB;
+        if (!buildSlot("a", lb->slotAProxyId, lb->slotAAdapter, tagA)) return {};
+        if (!buildSlot("b", lb->slotBProxyId, lb->slotBAdapter, tagB)) return {};
+
+        auto memberObj = [](const QString &outboundTag, int weight, int maxConn) {
+            QJsonObject obj{{"outbound", outboundTag}, {"weight", weight}};
+            if (maxConn > 0) obj["max_connections"] = maxConn;
+            return obj;
+        };
+        status->outbounds += QJsonObject{
+            {"type", "weighted"},
+            {"tag", "proxy"},
+            {"outbounds", QJsonArray{
+                              memberObj(tagA, lb->slotAWeight, lb->slotAMaxConn),
+                              memberObj(tagB, lb->slotBWeight, lb->slotBMaxConn),
+                          }},
+        };
+
+        status->ent->traffic_data->id = status->ent->id;
+        status->ent->traffic_data->tag = "proxy";
+        status->result->outboundStat = status->ent->traffic_data;
+        status->result->outboundStats += status->ent->traffic_data;
+
+        return "proxy";
+    }
+
 #define DOMAIN_USER_RULE                                                             \
     for (const auto &line: SplitLinesSkipSharp(dataStore->routing->proxy_domain)) {  \
         if (dataStore->routing->dns_routing) status->domainListDNSRemote += line;    \
@@ -392,6 +497,28 @@ namespace NekoGui {
 
         // Inbounds
 
+        // vload: sniff/domain_strategy moved from legacy per-inbound fields to
+        // route rule actions (removed in sing-box 1.13.0, see
+        // https://sing-box.sagernet.org/migration/#migrate-legacy-inbound-fields-to-rule-actions).
+        // Collected here, prepended to routingRules below so they still run
+        // before any rule that depends on sniffed data.
+        QJsonArray sniffRules;
+        auto addSniffRules = [&](const QString &inboundTag) {
+            if (!dataStore->routing->domain_strategy.isEmpty()) {
+                sniffRules += QJsonObject{
+                    {"inbound", inboundTag},
+                    {"action", "resolve"},
+                    {"strategy", dataStore->routing->domain_strategy},
+                };
+            }
+            if (dataStore->routing->sniffing_mode != SniffingMode::DISABLE) {
+                sniffRules += QJsonObject{
+                    {"inbound", inboundTag},
+                    {"action", "sniff"},
+                };
+            }
+        };
+
         // mixed-in
         if (IsValidPort(dataStore->inbound_socks_port) && !status->forTest) {
             QJsonObject inboundObj;
@@ -399,10 +526,6 @@ namespace NekoGui {
             inboundObj["type"] = "mixed";
             inboundObj["listen"] = dataStore->inbound_address;
             inboundObj["listen_port"] = dataStore->inbound_socks_port;
-            if (dataStore->routing->sniffing_mode != SniffingMode::DISABLE) {
-                inboundObj["sniff"] = true;
-                inboundObj["sniff_override_destination"] = dataStore->routing->sniffing_mode == SniffingMode::FOR_DESTINATION;
-            }
             if (dataStore->inbound_auth->NeedAuth()) {
                 inboundObj["users"] = QJsonArray{
                     QJsonObject{
@@ -411,8 +534,8 @@ namespace NekoGui {
                     },
                 };
             }
-            inboundObj["domain_strategy"] = dataStore->routing->domain_strategy;
             status->inbounds += inboundObj;
+            addSniffRules("mixed-in");
         }
 
         // tun-in
@@ -426,18 +549,17 @@ namespace NekoGui {
             inboundObj["mtu"] = dataStore->vpn_mtu;
             inboundObj["stack"] = Preset::SingBox::VpnImplementation.value(dataStore->vpn_implementation);
             inboundObj["strict_route"] = dataStore->vpn_strict_route;
-            inboundObj["inet4_address"] = "172.19.0.1/28";
-            if (dataStore->vpn_ipv6) inboundObj["inet6_address"] = "fdfe:dcba:9876::1/126";
-            if (dataStore->routing->sniffing_mode != SniffingMode::DISABLE) {
-                inboundObj["sniff"] = true;
-                inboundObj["sniff_override_destination"] = dataStore->routing->sniffing_mode == SniffingMode::FOR_DESTINATION;
-            }
-            inboundObj["domain_strategy"] = dataStore->routing->domain_strategy;
+            // vload: inet4_address/inet6_address merged into "address" in
+            // sing-box 1.10.0, removed in 1.12.0 (see migration.md#1100)
+            QJsonArray tunAddress{"172.19.0.1/28"};
+            if (dataStore->vpn_ipv6) tunAddress += "fdfe:dcba:9876::1/126";
+            inboundObj["address"] = tunAddress;
             status->inbounds += inboundObj;
+            addSniffRules("tun-in");
         }
 
         // Outbounds
-        auto tagProxy = BuildChain(0, status);
+        auto tagProxy = status->ent->type == "loadbalance" ? BuildLoadBalance(status) : BuildChain(0, status);
         if (!status->result->error.isEmpty()) return;
 
         // direct & bypass & block
@@ -453,13 +575,6 @@ namespace NekoGui {
             {"type", "block"},
             {"tag", "block"},
         };
-        if (!status->forTest) {
-            status->outbounds += QJsonObject{
-                {"type", "dns"},
-                {"tag", "dns-out"},
-            };
-        }
-
         // custom inbound
         if (!status->forTest) QJSONARRAY_ADD(status->inbounds, QString2QJsonObject(dataStore->custom_inbound)["inbounds"].toArray())
 
@@ -630,7 +745,7 @@ namespace NekoGui {
         if (!status->forTest) {
             status->routingRules += QJsonObject{
                 {"protocol", "dns"},
-                {"outbound", "dns-out"},
+                {"action", "hijack-dns"},
             };
         }
 
@@ -700,8 +815,9 @@ namespace NekoGui {
         if (geosite.isEmpty()) status->result->error = +"geosite.db not found";
 
         // final add routing rule
-        auto routingRules = QString2QJsonObject(dataStore->routing->custom)["rules"].toArray();
-        if (status->forTest) routingRules = {};
+        // sniff/resolve rules go first: later rules may match on sniffed data
+        QJsonArray routingRules = status->forTest ? QJsonArray{} : sniffRules;
+        QJSONARRAY_ADD(routingRules, QString2QJsonObject(dataStore->routing->custom)["rules"].toArray())
         if (!status->forTest) QJSONARRAY_ADD(routingRules, QString2QJsonObject(dataStore->custom_route_global)["rules"].toArray())
         QJSONARRAY_ADD(routingRules, status->routingRules)
         auto routeObj = QJsonObject{

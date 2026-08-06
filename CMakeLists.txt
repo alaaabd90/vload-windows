@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(nekobox VERSION 0.1 LANGUAGES CXX)
+project(nekobox VERSION 1.1.0 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -154,6 +154,7 @@ set(PROJECT_SOURCES
         fmt/Bean2Link.cpp
         fmt/Link2Bean.cpp
         fmt/ChainBean.hpp # translate
+        fmt/LoadBalanceBean.hpp # translate
 
         sub/GroupUpdater.cpp
 
@@ -178,6 +179,9 @@ set(PROJECT_SOURCES
         ui/edit/edit_chain.h
         ui/edit/edit_chain.cpp
         ui/edit/edit_chain.ui
+        ui/edit/edit_loadbalance.h
+        ui/edit/edit_loadbalance.cpp
+        ui/edit/edit_loadbalance.ui
         ui/edit/edit_socks_http.h
         ui/edit/edit_socks_http.cpp
         ui/edit/edit_socks_http.ui

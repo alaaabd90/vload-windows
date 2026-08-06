@@ -3,6 +3,7 @@
 #include "SocksHttpBean.hpp"
 #include "ShadowSocksBean.hpp"
 #include "ChainBean.hpp"
+#include "LoadBalanceBean.hpp"
 #include "VMessBean.hpp"
 #include "TrojanVLESSBean.hpp"
 #include "NaiveBean.hpp"

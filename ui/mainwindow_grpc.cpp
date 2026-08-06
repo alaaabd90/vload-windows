@@ -6,6 +6,7 @@
 #include "db/traffic/TrafficLooper.hpp"
 #include "rpc/gRPC.h"
 #include "ui/widget/MessageBoxTimer.h"
+#include "fmt/LoadBalanceBean.hpp"
 
 #include <QTimer>
 #include <QThread>
@@ -14,6 +15,7 @@
 #include <QDesktopServices>
 #include <QMessageBox>
 #include <QDialogButtonBox>
+#include <QNetworkInterface>
 
 // ext core
 
@@ -485,6 +487,78 @@ void MainWindow::neko_stop(bool crash, bool sem) {
             restartMsgbox->deleteLater();
         });
     });
+}
+
+// vload: poll the two adapters a running load-balance profile is pinned to
+// and tell nekobox_core when one goes up/down, so the "weighted" outbound
+// group can fail traffic over to the surviving network. Called from the
+// existing 2s status-refresh timer in MainWindow's constructor - only does
+// anything while a "loadbalance" profile is the one actually running.
+void MainWindow::CheckLoadBalanceNetworkAvailability() {
+#ifndef NKR_NO_GRPC
+    static int lastProfileId = -1;
+    // Tracks whether the *previous* tick saw the core running, so a stop+
+    // restart of the very same profile id is still treated as a brand new
+    // box instance below (see the reset condition) - matching a fresh one
+    // started under a different id is not enough, since editing a profile's
+    // slots and restarting it keeps the same id.
+    static bool wasRunning = false;
+    // -1 = unknown (forces an initial push once the profile starts), 0 = down, 1 = up.
+    // The core's Weighted group starts every member unavailable until told
+    // otherwise (see protocol/group/weighted_swrr.go) - it never assumes "up",
+    // so the very first check after a profile starts must always send its
+    // real state, even if that state happens to match whatever this was
+    // initialized to.
+    static int lastA = -1;
+    static int lastB = -1;
+
+    if (!NekoGui::dataStore->core_running || NekoGui::dataStore->started_id < 0) {
+        lastProfileId = -1;
+        wasRunning = false;
+        return;
+    }
+
+    auto ent = NekoGui::profileManager->GetProfile(NekoGui::dataStore->started_id);
+    if (ent == nullptr || ent->type != "loadbalance") {
+        lastProfileId = -1;
+        wasRunning = false;
+        return;
+    }
+
+    if (ent->id != lastProfileId || !wasRunning) {
+        // a fresh box instance either way: a different profile, or the same
+        // profile stopped and started again (new Weighted group, unavailable
+        // by default) - either way lastA/lastB must not carry over
+        lastProfileId = ent->id;
+        lastA = -1;
+        lastB = -1;
+    }
+    wasRunning = true;
+
+    auto adapterUp = [](const QString &name) {
+        if (name.isEmpty()) return true;
+        for (const auto &iface: QNetworkInterface::allInterfaces()) {
+            if (iface.humanReadableName() == name) {
+                return iface.flags().testFlag(QNetworkInterface::IsUp) &&
+                       iface.flags().testFlag(QNetworkInterface::IsRunning);
+            }
+        }
+        return false; // adapter unplugged/renamed/gone
+    };
+
+    auto bean = ent->LoadBalanceBean();
+    int nowA = adapterUp(bean->slotAAdapter) ? 1 : 0;
+    int nowB = adapterUp(bean->slotBAdapter) ? 1 : 0;
+
+    if (nowA != lastA) {
+        lastA = nowA;
+        defaultClient->UpdateNetworkAvailability(0, nowA == 1);
+    }
+    if (nowB != lastB) {
+        lastB = nowB;
+        defaultClient->UpdateNetworkAvailability(1, nowB == 1);
+    }
+#endif
 }
 
 void MainWindow::CheckUpdate() {

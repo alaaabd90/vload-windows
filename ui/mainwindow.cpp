@@ -100,9 +100,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->toolButton_preferences->setMenu(ui->menu_preferences);
     ui->toolButton_server->setMenu(ui->menu_server);
     ui->menubar->setVisible(false);
-    connect(ui->toolButton_document, &QToolButton::clicked, this, [=] { QDesktopServices::openUrl(QUrl("https://matsuridayo.github.io/")); });
-    connect(ui->toolButton_ads, &QToolButton::clicked, this, [=] { QDesktopServices::openUrl(QUrl("https://neko-box.pages.dev/喵")); });
-    connect(ui->toolButton_update, &QToolButton::clicked, this, [=] { runOnNewThread([=] { CheckUpdate(); }); });
+    connect(ui->toolButton_theme_toggle, &QToolButton::clicked, this, [=] {
+        // "3" (blacksoft, the only full dark stylesheet ThemeManager ships)
+        // vs "0" (system/light) - persisted in dataStore->theme, the same
+        // field ApplyTheme(dataStore->theme) already reads on every startup,
+        // so the choice is remembered across relaunches with no extra state.
+        auto isDark = NekoGui::dataStore->theme == "3";
+        auto newTheme = isDark ? "0" : "3";
+        themeManager->ApplyTheme(newTheme);
+        NekoGui::dataStore->theme = newTheme;
+        NekoGui::dataStore->Save();
+    });
     connect(ui->toolButton_url_test, &QToolButton::clicked, this, [=] { speedtest_current_group(1, true); });
 
     // Setup log UI
@@ -425,6 +433,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     auto t = new QTimer;
     connect(t, &QTimer::timeout, this, [=]() { refresh_status(); });
     t->start(2000);
+
+    auto lbTimer = new QTimer;
+    connect(lbTimer, &QTimer::timeout, this, [=]() { CheckLoadBalanceNetworkAvailability(); });
+    lbTimer->start(2000);
 
     t = new QTimer;
     connect(t, &QTimer::timeout, this, [&] { NekoGui_sys::logCounter.fetchAndStoreRelaxed(0); });
@@ -759,7 +771,7 @@ void MainWindow::neko_set_spmode_vpn(bool enable, bool save) {
                     }
 #endif
 #ifdef Q_OS_WIN
-                    auto n = QMessageBox::warning(GetMessageBoxParent(), software_name, tr("Please run NekoBox as admin"), QMessageBox::Yes | QMessageBox::No);
+                    auto n = QMessageBox::warning(GetMessageBoxParent(), software_name, tr("Please run %1 as admin").arg(software_name), QMessageBox::Yes | QMessageBox::No);
                     if (n == QMessageBox::Yes) {
                         this->exit_reason = 3;
                         on_menu_exit_triggered();
@@ -1290,7 +1302,7 @@ void MainWindow::display_qr_link(bool nkrFormat) {
             l->setScaledContents(true);
             layout()->addWidget(l);
             cb = new QCheckBox;
-            cb->setText("Neko Links");
+            cb->setText("Extended Links");
             layout()->addWidget(cb);
             l2 = new QPlainTextEdit();
             l2->setReadOnly(true);

@@ -25,7 +25,7 @@ func (s *BaseServer) Update(ctx context.Context, in *gen.UpdateReq) (*gen.Update
 		ctx, cancel := context.WithTimeout(ctx, time.Second*10)
 		defer cancel()
 
-		req, _ := http.NewRequestWithContext(ctx, "GET", "https://api.github.com/repos/MatsuriDayo/nekoray/releases", nil)
+		req, _ := http.NewRequestWithContext(ctx, "GET", "https://api.github.com/repos/alaaabd90/vload-windows/releases", nil)
 		resp, err := client.Do(req)
 		if err != nil {
 			ret.Error = err.Error()
@@ -48,7 +48,7 @@ func (s *BaseServer) Update(ctx context.Context, in *gen.UpdateReq) (*gen.Update
 			return ret, nil
 		}
 
-		nowVer := strings.TrimLeft(neko_common.Version_neko, "nekoray-")
+		nowVer := strings.TrimPrefix(neko_common.Version_neko, "vload-")
 
 		var search string
 		if runtime.GOOS == "windows" && runtime.GOARCH == "amd64" {

@@ -4,6 +4,7 @@
 #include "ui/edit/edit_socks_http.h"
 #include "ui/edit/edit_shadowsocks.h"
 #include "ui/edit/edit_chain.h"
+#include "ui/edit/edit_loadbalance.h"
 #include "ui/edit/edit_vmess.h"
 #include "ui/edit/edit_trojan_vless.h"
 #include "ui/edit/edit_naive.h"
@@ -120,6 +121,7 @@ DialogEditProfile::DialogEditProfile(const QString &_type, int profileOrGroupId,
         ui->type->addItem(tr("Custom (%1 config)").arg(software_core_name), "internal-full");
         ui->type->addItem(tr("Custom (Extra Core)"), "custom");
         LOAD_TYPE("chain")
+        LOAD_TYPE("loadbalance")
 
         // type changed
         connect(ui->type, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, [=](int index) {
@@ -157,6 +159,10 @@ void DialogEditProfile::typeSelected(const QString &newType) {
         innerEditor = _innerWidget;
     } else if (type == "chain") {
         auto _innerWidget = new EditChain(this);
+        innerWidget = _innerWidget;
+        innerEditor = _innerWidget;
+    } else if (type == "loadbalance") {
+        auto _innerWidget = new EditLoadBalance(this);
         innerWidget = _innerWidget;
         innerEditor = _innerWidget;
     } else if (type == "vmess") {
@@ -197,7 +203,7 @@ void DialogEditProfile::typeSelected(const QString &newType) {
     }
 
     // hide some widget
-    auto showAddressPort = type != "chain" && customType != "internal" && customType != "internal-full";
+    auto showAddressPort = type != "chain" && type != "loadbalance" && customType != "internal" && customType != "internal-full";
     ui->address->setVisible(showAddressPort);
     ui->address_l->setVisible(showAddressPort);
     ui->port->setVisible(showAddressPort);

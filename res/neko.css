@@ -1,3 +1,16 @@
 QMessageBox {
     messagebox-text-interaction-flags: 5;
 }
+
+/* The top toolbar buttons show an icon with a text label underneath. The
+   dark theme (blacksoft.css) sets a blanket "min-height:15px" on every
+   QToolButton, which is far below what icon+label-under-icon needs -
+   Qt then shrinks these specific buttons to that CSS min-height instead of
+   their natural size, clipping the icon and label. neko.css is always
+   appended after the theme stylesheet, so this override applies regardless
+   of which theme is active. */
+#toolButton_program, #toolButton_preferences, #toolButton_server,
+#toolButton_theme_toggle, #toolButton_url_test {
+    min-height: 56px;
+    min-width: 56px;
+}
