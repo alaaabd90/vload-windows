@@ -21,6 +21,11 @@ jobs:
         include:
           - cross_os: public_res
             cross_arch: public_res
+          # Windows on ARM64 (Qt 6.8+ LTS target, see build-cpp below). Go
+          # cross-compiles for this trivially since CGO_ENABLED=0 - no cross
+          # C toolchain needed for the core itself.
+          - cross_os: windows
+            cross_arch: arm64
       fail-fast: false
     runs-on: ubuntu-latest
     steps:
@@ -65,6 +70,17 @@ jobs:
           - platform: ubuntu-20.04
             arch: x64
             qt_version: "5.12"
+          # Windows on ARM64 - official Qt6 LTS support since 6.8 (prebuilt
+          # win64_msvc2019_arm64 packages, fetched from Qt's own servers via
+          # install-qt-action, unlike the x64 job's MatsuriDayo-hosted
+          # repackage which has no arm64 build). Cross-compiled from an x64
+          # runner - no arm64 runner needed, matching the standard approach
+          # for MSVC ARM64 targets. This path is untested locally (no arm64
+          # toolchain/hardware available in local dev) - first real
+          # validation is whatever this job reports on GitHub's runners.
+          - platform: windows-2022
+            arch: arm64
+            qt_version: "6.8.1"
       fail-fast: false
 
     runs-on: ${{ matrix.platform }}
@@ -83,12 +99,20 @@ jobs:
           toolset: 14.2
           arch: ${{ matrix.arch }}
       # ========================================================================================================= Qt Install
-      - name: Windows - Download Custom Qt ${{ matrix.qt_version }} SDK
+      - name: Windows x64 - Download Custom Qt ${{ matrix.qt_version }} SDK
         shell: bash
-        if: matrix.platform == 'windows-2022'
+        if: matrix.platform == 'windows-2022' && matrix.arch == 'x64'
         env:
           DL_QT_VER: ${{ matrix.qt_version }}
         run: bash ./libs/download_qtsdk_win.sh
+      - name: Windows arm64 - Install official Qt ${{ matrix.qt_version }} SDK
+        if: matrix.platform == 'windows-2022' && matrix.arch == 'arm64'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ matrix.qt_version }}
+          arch: win64_msvc2019_arm64
+          dir: ${{ github.workspace }}/qtsdk
+          set-env: true
       # ========================================================================================================= 编译与 Qt 无关的依赖
       - name: Install ninja-build tool
         uses: seanmiddleditch/gha-setup-ninja@v3
@@ -112,9 +136,9 @@ jobs:
             ghcr.io/matsuridayo/debian10-qt5:20230131 \
             bash -c "./libs/build_deps_all.sh"
       # ========================================================================================================= Generate MakeFile and Build
-      - name: Windows - Generate MakeFile and Build
+      - name: Windows x64 - Generate MakeFile and Build
         shell: bash
-        if: matrix.platform == 'windows-2022'
+        if: matrix.platform == 'windows-2022' && matrix.arch == 'x64'
         env:
           DL_QT_VER: ${{ matrix.qt_version }}
           CC: cl.exe
@@ -127,6 +151,19 @@ jobs:
           ninja -j2
           cd ..
           ./libs/deploy_windows64.sh
+      - name: Windows arm64 - Generate MakeFile and Build
+        shell: bash
+        if: matrix.platform == 'windows-2022' && matrix.arch == 'arm64'
+        env:
+          CC: cl.exe
+          CXX: cl.exe
+        run: |
+          mkdir build
+          cd build
+          cmake -GNinja -DQT_VERSION_MAJOR=6 -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR" ..
+          ninja -j2
+          cd ..
+          ./libs/deploy_windows_arm64.sh
       - name: Linux - Generate MakeFile and Build
         shell: bash
         if: matrix.platform == 'ubuntu-20.04'
@@ -169,6 +206,7 @@ jobs:
           cd deployment
           cp -r public_res/* linux64
           cp -r public_res/* windows64
+          [ -d windows-arm64 ] && cp -r public_res/* windows-arm64 || true
           rm -rf public_res *.pdb
           ####
           mv linux64 nekoray
@@ -178,6 +216,12 @@ jobs:
           mv windows64 nekoray
           zip -r $version_standalone-windows64.zip nekoray
           rm -rf nekoray
+          ####
+          if [ -d windows-arm64 ]; then
+            mv windows-arm64 nekoray
+            zip -r $version_standalone-windows-arm64.zip nekoray
+            rm -rf nekoray
+          fi
       - name: Pack Debian
         run: |
           source libs/env_deploy.sh
@@ -202,6 +246,7 @@ jobs:
           cd deployment
           rm -rf linux64
           rm -rf windows64
+          rm -rf windows-arm64
           rm -rf public_res
           rm -rf *.pdb
       - name: Uploading Artifact
