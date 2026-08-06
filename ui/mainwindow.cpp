@@ -21,6 +21,8 @@
 #include "ui/material/NavDrawer.hpp"
 #include "ui/material/ConnectFab.hpp"
 #include "ui/material/StatsBar.hpp"
+#include "ui/dialog_stun_test.h"
+#include "ui/dialog_about.h"
 #include "main/MaterialPalette.hpp"
 
 #include "3rdparty/fix_old_qt.h"
@@ -131,10 +133,30 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             on_menu_routing_settings_triggered();
         } else if (itemId == "nav_settings") {
             on_menu_basic_settings_triggered();
+        } else if (itemId == "nav_traffic") {
+            // Matches Android's WebviewFragment: sing-box's own clash_api
+            // "external_ui" already serves a full yacd dashboard (see
+            // ConfigBuilder.cpp's experimental.clash_api block) - no new
+            // backend work needed, just open it in the system browser
+            // instead of embedding a WebView (avoids pulling in the heavy
+            // QtWebEngine module for something the OS browser already does).
+            if (NekoGui::dataStore->core_box_clash_api > 0) {
+                QDesktopServices::openUrl(QUrl(QStringLiteral("http://127.0.0.1:%1/ui").arg(NekoGui::dataStore->core_box_clash_api)));
+            } else {
+                MessageBoxWarning(tr("Traffic"), tr("Enable the Clash API port in Basic Settings > Core first."));
+            }
+        } else if (itemId == "nav_tools") {
+            auto dialog = new DialogStunTest(this);
+            dialog->setAttribute(Qt::WA_DeleteOnClose);
+            dialog->show();
+        } else if (itemId == "nav_about") {
+            auto dialog = new DialogAbout(this);
+            dialog->on_check_update = [=] { CheckUpdate(); };
+            dialog->setAttribute(Qt::WA_DeleteOnClose);
+            dialog->show();
         }
         // nav_configuration is the main window itself (already visible);
-        // nav_logcat is the existing embedded log tab (already visible);
-        // nav_traffic/nav_tools/nav_about are Phase 4 (not built yet).
+        // nav_logcat is the existing embedded log tab (already visible).
     });
 
     connectFab = new ConnectFab(ui->centralwidget);

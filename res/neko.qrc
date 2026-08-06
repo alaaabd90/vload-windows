@@ -21,6 +21,7 @@
         <file>vpn/vpn-run-root.sh</file>
         <file>vpn/sing-box-vpn.json</file>
         <file>dashboard-notice.html</file>
+        <file alias="LICENSE">../LICENSE</file>
     </qresource>
     <qresource prefix="/theme">
         <file alias="material/base.qss.tpl">theme/material/base.qss.tpl</file>

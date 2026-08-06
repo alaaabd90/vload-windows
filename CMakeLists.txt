@@ -259,6 +259,14 @@ set(PROJECT_SOURCES
         ui/dialog_hotkey.h
         ui/dialog_hotkey.ui
 
+        ui/dialog_stun_test.cpp
+        ui/dialog_stun_test.h
+        ui/dialog_stun_test.ui
+
+        ui/dialog_about.cpp
+        ui/dialog_about.h
+        ui/dialog_about.ui
+
         ui/widget/ProxyItem.cpp
         ui/widget/ProxyItem.h
         ui/widget/ProxyItem.ui
