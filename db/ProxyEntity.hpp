@@ -34,6 +34,8 @@ namespace NekoGui_fmt {
     class WireGuardBean;
 
     class TrojanGoBean;
+
+    class MieruBean;
 }; // namespace NekoGui_fmt
 
 namespace NekoGui {
@@ -113,6 +115,10 @@ namespace NekoGui {
 
         [[nodiscard]] NekoGui_fmt::TrojanGoBean *TrojanGoBean() const {
             return (NekoGui_fmt::TrojanGoBean *) bean.get();
+        };
+
+        [[nodiscard]] NekoGui_fmt::MieruBean *MieruBean() const {
+            return (NekoGui_fmt::MieruBean *) bean.get();
         };
     };
 } // namespace NekoGui

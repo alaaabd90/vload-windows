@@ -204,6 +204,8 @@ namespace NekoGui {
             bean = new NekoGui_fmt::WireGuardBean();
         } else if (type == "trojan-go") {
             bean = new NekoGui_fmt::TrojanGoBean();
+        } else if (type == "mieru") {
+            bean = new NekoGui_fmt::MieruBean();
         } else {
             bean = new NekoGui_fmt::AbstractBean(-114514);
         }

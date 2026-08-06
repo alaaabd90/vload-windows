@@ -227,6 +227,10 @@ set(PROJECT_SOURCES
         ui/edit/edit_trojan_go.cpp
         ui/edit/edit_trojan_go.ui
 
+        ui/edit/edit_mieru.h
+        ui/edit/edit_mieru.cpp
+        ui/edit/edit_mieru.ui
+
         ui/edit/edit_custom.h
         ui/edit/edit_custom.cpp
         ui/edit/edit_custom.ui

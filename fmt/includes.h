@@ -15,3 +15,4 @@
 #include "HysteriaBean.hpp"
 #include "WireGuardBean.hpp"
 #include "TrojanGoBean.hpp"
+#include "MieruBean.hpp"

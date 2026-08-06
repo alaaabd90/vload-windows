@@ -152,6 +152,7 @@ DialogBasicSettings::DialogBasicSettings(QWidget *parent)
     if (!CACHE.extraCore.contains("hysteria2")) CACHE.extraCore.insert("hysteria2", "");
     if (!CACHE.extraCore.contains("tuic")) CACHE.extraCore.insert("tuic", "");
     if (!CACHE.extraCore.contains("trojan-go")) CACHE.extraCore.insert("trojan-go", "");
+    if (!CACHE.extraCore.contains("mieru")) CACHE.extraCore.insert("mieru", "");
     //
     auto extra_core_layout = ui->extra_core_box_scrollAreaWidgetContents->layout();
     for (const auto &s: CACHE.extraCore.keys()) {

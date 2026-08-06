@@ -279,6 +279,55 @@ namespace NekoGui_fmt {
         return result;
     }
 
+    int MieruBean::NeedExternal(bool isFirstProfile) {
+        if (isFirstProfile) {
+            if (NekoGui::dataStore->spmode_vpn) {
+                return 1;
+            }
+            return 2;
+        }
+        return 1;
+    }
+
+    ExternalBuildResult MieruBean::BuildExternal(int mapping_port, int socks_port, int external_stat) {
+        ExternalBuildResult result{NekoGui::dataStore->extraCore->Get("mieru")};
+
+        auto is_direct = external_stat == 2;
+        auto remote_address = is_direct ? serverAddress : QStringLiteral("127.0.0.1");
+        auto remote_port = is_direct ? serverPort : mapping_port;
+
+        QJsonObject config{
+            {"activeProfile", "default"},
+            {"socks5Port", socks_port},
+            {"loggingLevel", "INFO"},
+            {"profiles", QJsonArray{
+                             QJsonObject{
+                                 {"profileName", "default"},
+                                 {"user", QJsonObject{{"name", username}, {"password", password}}},
+                                 {"servers", QJsonArray{
+                                                 QJsonObject{
+                                                     {"ipAddress", WrapIPV6Host(remote_address)},
+                                                     {"portBindings", QJsonArray{
+                                                                          QJsonObject{{"port", remote_port}, {"protocol", protocol}},
+                                                                      }},
+                                                 },
+                                             }},
+                                 {"mtu", mtu},
+                             },
+                         }},
+        };
+
+        result.config_export = QJsonObject2QString(config, false);
+        WriteTempFile("mieru_" + GetRandomString(10) + ".json", result.config_export.toUtf8());
+        // mieru-client takes its config path via an env var, not a CLI flag,
+        // and is invoked with a single "run" subcommand (see mieru's own
+        // Android integration in bg/proto/BoxInstance.kt - no -config flag).
+        result.env += "MIERU_CONFIG_JSON_FILE=" + TempFile;
+        result.arguments = QStringList{"run"};
+
+        return result;
+    }
+
     ExternalBuildResult CustomBean::BuildExternal(int mapping_port, int socks_port, int external_stat) {
         ExternalBuildResult result{NekoGui::dataStore->extraCore->Get(core)};
 
