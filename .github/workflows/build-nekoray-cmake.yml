@@ -151,6 +151,8 @@ jobs:
       - name: Build Dependencies
         shell: bash
         if: steps.cache-deps.outputs.cache-hit != 'true' && matrix.platform != 'ubuntu-latest'
+        env:
+          TARGET_ARCH: ${{ matrix.arch }}
         run: ./libs/build_deps_all.sh
       - name: Build Dependencies (Docker)
         shell: bash
