@@ -9,6 +9,7 @@
 #include <QTime>
 #include <QTableWidgetItem>
 #include <QKeyEvent>
+#include <QResizeEvent>
 #include <QSystemTrayIcon>
 #include <QProcess>
 #include <QTextDocument>
@@ -162,6 +163,10 @@ private:
     QMutex mu_exit;
     QSemaphore sem_stopped;
     int exit_reason = 0;
+    //
+    class NavDrawer *navDrawer = nullptr;
+    class ConnectFab *connectFab = nullptr;
+    class StatsBar *statsBar = nullptr;
 
     QList<std::shared_ptr<NekoGui::ProxyEntity>> get_now_selected_list();
 
@@ -176,6 +181,8 @@ private:
     void keyPressEvent(QKeyEvent *event) override;
 
     void closeEvent(QCloseEvent *event) override;
+
+    void resizeEvent(QResizeEvent *event) override;
 
     //
 

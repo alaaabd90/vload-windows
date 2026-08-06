@@ -16,6 +16,9 @@
 #include "ui/dialog_manage_routes.h"
 #include "ui/dialog_vpn_settings.h"
 #include "ui/dialog_hotkey.h"
+#include "ui/material/NavDrawer.hpp"
+#include "ui/material/ConnectFab.hpp"
+#include "ui/material/StatsBar.hpp"
 
 #include "3rdparty/fix_old_qt.h"
 #include "3rdparty/qrcodegen.hpp"
@@ -109,6 +112,41 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         NekoGui::dataStore->Save();
     });
     connect(ui->toolButton_url_test, &QToolButton::clicked, this, [=] { speedtest_current_group(1, true); });
+
+    // Material UI overlay widgets (see plan: Phase 1 adds these alongside
+    // the existing toolbar/checkboxes rather than replacing them outright,
+    // to avoid risking the drag-reorder/selection/context-menu logic still
+    // built around the classic table - CardListWidget migration is a
+    // separate, dedicated follow-up).
+    navDrawer = new NavDrawer(ui->centralwidget);
+    connect(ui->toolButton_drawer, &QToolButton::clicked, this, [=] { navDrawer->toggle(); });
+    connect(navDrawer, &NavDrawer::itemActivated, this, [=](const QString &itemId) {
+        if (itemId == "nav_group") {
+            on_menu_manage_groups_triggered();
+        } else if (itemId == "nav_route") {
+            on_menu_routing_settings_triggered();
+        } else if (itemId == "nav_settings") {
+            on_menu_basic_settings_triggered();
+        }
+        // nav_configuration is the main window itself (already visible);
+        // nav_logcat is the existing embedded log tab (already visible);
+        // nav_traffic/nav_tools/nav_about are Phase 4 (not built yet).
+    });
+
+    connectFab = new ConnectFab(ui->centralwidget);
+    connectFab->raise();
+    connect(connectFab, &ConnectFab::clicked, this, [=] {
+        if (running != nullptr) {
+            neko_stop();
+        } else {
+            neko_start();
+        }
+    });
+
+    statsBar = new StatsBar(this);
+    ui->verticalLayout_3->addWidget(statsBar);
+    connectFab->move(ui->centralwidget->width() - connectFab->width() - 16,
+                      ui->centralwidget->height() - connectFab->height() - 16 - 56);
 
     // Setup log UI
     ui->splitter->restoreState(DecodeB64IfValid(NekoGui::dataStore->splitter_state));
@@ -454,6 +492,24 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     if (tray->isVisible()) {
         hide();          // 隐藏窗口
         event->ignore(); // 忽略事件
+    }
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event) {
+    QMainWindow::resizeEvent(event);
+    // Overlay widgets (see plan: Phase 1) aren't managed by centralwidget's
+    // layout, so they need manual repositioning on every resize - NavDrawer
+    // covers the full height on the left, ConnectFab floats bottom-right
+    // overlapping StatsBar's top edge (matching Android's FAB-anchored-to-
+    // bottom-bar layout).
+    if (navDrawer != nullptr) {
+        navDrawer->setFixedHeight(ui->centralwidget->height());
+        if (navDrawer->isVisible()) navDrawer->move(0, 0);
+    }
+    if (connectFab != nullptr) {
+        auto margin = 16;
+        connectFab->move(ui->centralwidget->width() - connectFab->width() - margin,
+                          ui->centralwidget->height() - connectFab->height() - margin - 56 /* StatsBar height */);
     }
 }
 
@@ -814,8 +870,10 @@ void MainWindow::refresh_status(const QString &traffic_update) {
     auto refresh_speed_label = [=] {
         if (traffic_update_cache == "") {
             ui->label_speed->setText(QObject::tr("Proxy: %1\nDirect: %2").arg("", ""));
+            if (statsBar != nullptr) statsBar->setTraffic("0 B", "0 B");
         } else {
             ui->label_speed->setText(traffic_update_cache);
+            if (statsBar != nullptr) statsBar->setTraffic(traffic_update_cache, "");
         }
     };
 
@@ -898,6 +956,25 @@ void MainWindow::refresh_status(const QString &traffic_update) {
     }
 
     icon_status = icon_status_new;
+
+    // refresh Material overlay widgets (StatsBar/ConnectFab) - mirrors the
+    // same state the tray icon/title/label_running/checkboxes above already
+    // derive, just surfaced through the new Android-style widgets instead of
+    // (in addition to, for now - see plan Phase 1) the classic checkboxes.
+    if (statsBar != nullptr) {
+        statsBar->setStatus(running == nullptr ? tr("Not connected")
+                                                : QStringLiteral("[%1] %2").arg(group_name, running->bean->DisplayName()));
+    }
+    if (connectFab != nullptr) {
+        ConnectFab::State fabState;
+        switch (icon_status_new) {
+            case Icon::VPN: fabState = ConnectFab::State::Connected; break;
+            case Icon::SYSTEM_PROXY: fabState = ConnectFab::State::SystemProxy; break;
+            case Icon::RUNNING: fabState = ConnectFab::State::Connected; break;
+            default: fabState = ConnectFab::State::Idle; break;
+        }
+        connectFab->setState(fabState);
+    }
 }
 
 // table显示
