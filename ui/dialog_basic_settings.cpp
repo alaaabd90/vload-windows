@@ -7,6 +7,7 @@
 #include "ui/Icon.hpp"
 #include "main/GuiUtils.hpp"
 #include "main/NekoGui.hpp"
+#include "main/MaterialPalette.hpp"
 
 #include <QStyleFactory>
 #include <QFileDialog>
@@ -119,25 +120,15 @@ DialogBasicSettings::DialogBasicSettings(QWidget *parent)
         CACHE.needRestart = true;
     });
     //
-    int built_in_len = ui->theme->count();
-    ui->theme->addItems(QStyleFactory::keys());
-    //
-    bool ok;
-    auto themeId = NekoGui::dataStore->theme.toInt(&ok);
-    if (ok) {
-        ui->theme->setCurrentIndex(themeId);
-    } else {
-        ui->theme->setCurrentText(NekoGui::dataStore->theme);
+    for (const auto &t: MaterialPalette::themes) {
+        ui->theme->addItem(t.name);
     }
+    ui->theme->setCurrentText(NekoGui::dataStore->theme);
     //
     connect(ui->theme, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, [=](int index) {
-        if (index + 1 <= built_in_len) {
-            themeManager->ApplyTheme(Int2String(index));
-            NekoGui::dataStore->theme = Int2String(index);
-        } else {
-            themeManager->ApplyTheme(ui->theme->currentText());
-            NekoGui::dataStore->theme = ui->theme->currentText();
-        }
+        Q_UNUSED(index)
+        themeManager->ApplyTheme(ui->theme->currentText(), NekoGui::dataStore->dark_mode);
+        NekoGui::dataStore->theme = ui->theme->currentText();
         repaint();
         mainwindow->repaint();
         NekoGui::dataStore->Save();

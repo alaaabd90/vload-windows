@@ -2,10 +2,12 @@
 
 class ThemeManager {
 public:
-    QString system_style_name = "";
-    QString current_theme = "0"; // int: 0:system 1+:builtin string: QStyleFactory
+    // Theme *name* (e.g. "Pink_SSR", "Blue" - see main/MaterialPalette.hpp),
+    // not the old feiyangqingyun int id. Orthogonal to dark mode.
+    QString current_theme = "";
+    bool current_dark = false;
 
-    void ApplyTheme(const QString &theme);
+    void ApplyTheme(const QString &themeName, bool dark);
 };
 
 extern ThemeManager *themeManager;

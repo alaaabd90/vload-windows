@@ -62,7 +62,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     NekoGui::profileManager->LoadManager();
 
     // Setup misc UI
-    themeManager->ApplyTheme(NekoGui::dataStore->theme);
+    themeManager->ApplyTheme(NekoGui::dataStore->theme, NekoGui::dataStore->dark_mode);
     ui->setupUi(this);
     //
     connect(ui->menu_start, &QAction::triggered, this, [=]() { neko_start(); });
@@ -101,14 +101,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->toolButton_server->setMenu(ui->menu_server);
     ui->menubar->setVisible(false);
     connect(ui->toolButton_theme_toggle, &QToolButton::clicked, this, [=] {
-        // "3" (blacksoft, the only full dark stylesheet ThemeManager ships)
-        // vs "0" (system/light) - persisted in dataStore->theme, the same
-        // field ApplyTheme(dataStore->theme) already reads on every startup,
-        // so the choice is remembered across relaunches with no extra state.
-        auto isDark = NekoGui::dataStore->theme == "3";
-        auto newTheme = isDark ? "0" : "3";
-        themeManager->ApplyTheme(newTheme);
-        NekoGui::dataStore->theme = newTheme;
+        // dark_mode is orthogonal to the Material accent theme (dataStore->
+        // theme) - persisted the same way, so the choice is remembered
+        // across relaunches (mirrors mainwindow.cpp's startup ApplyTheme call).
+        NekoGui::dataStore->dark_mode = !NekoGui::dataStore->dark_mode;
+        themeManager->ApplyTheme(NekoGui::dataStore->theme, NekoGui::dataStore->dark_mode);
         NekoGui::dataStore->Save();
     });
     connect(ui->toolButton_url_test, &QToolButton::clicked, this, [=] { speedtest_current_group(1, true); });

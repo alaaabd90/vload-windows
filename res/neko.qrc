@@ -22,4 +22,7 @@
         <file>vpn/sing-box-vpn.json</file>
         <file>dashboard-notice.html</file>
     </qresource>
+    <qresource prefix="/theme">
+        <file alias="material/base.qss.tpl">theme/material/base.qss.tpl</file>
+    </qresource>
 </RCC>

@@ -1,86 +1,49 @@
-#include <QStyle>
 #include <QApplication>
-#include <QStyleFactory>
 
 #include "ThemeManager.hpp"
+#include "main/MaterialPalette.hpp"
 
 ThemeManager *themeManager = new ThemeManager;
 
 extern QString ReadFileText(const QString &path);
 
-void ThemeManager::ApplyTheme(const QString &theme) {
-    auto internal = [=] {
-        if (this->system_style_name.isEmpty()) {
-            this->system_style_name = qApp->style()->objectName();
-        }
-        if (this->current_theme == theme) {
-            return;
-        }
+void ThemeManager::ApplyTheme(const QString &themeName, bool dark) {
+    if (current_theme == themeName && current_dark == dark) return;
 
-        bool ok;
-        auto themeId = theme.toInt(&ok);
+    const auto &t = MaterialPalette::byName(themeName.isEmpty() ? "Pink_SSR" : themeName);
 
-        if (ok) {
-            // System & Built-in
-            QString qss;
+    QString windowBg, surfaceBg, textPrimary, textSecondary, divider;
+    if (dark) {
+        windowBg = "#121212";
+        surfaceBg = "#1E1E1E";
+        textPrimary = "#E0E0E0";
+        textSecondary = "#A0A0A0";
+        divider = "#333333";
+    } else {
+        windowBg = "#FAFAFA";
+        surfaceBg = "#FFFFFF";
+        textPrimary = "#212121";
+        textSecondary = "#616161";
+        divider = "#E0E0E0";
+    }
+    QString textOnAccent = t.darkText ? "#000000" : "#FFFFFF";
 
-            if (themeId != 0) {
-                QString path;
-                std::map<QString, QString> replace;
-                switch (themeId) {
-                    case 1:
-                        path = ":/themes/feiyangqingyun/qss/flatgray.css";
-                        replace[":/qss/"] = ":/themes/feiyangqingyun/qss/";
-                        break;
-                    case 2:
-                        path = ":/themes/feiyangqingyun/qss/lightblue.css";
-                        replace[":/qss/"] = ":/themes/feiyangqingyun/qss/";
-                        break;
-                    case 3:
-                        path = ":/themes/feiyangqingyun/qss/blacksoft.css";
-                        replace[":/qss/"] = ":/themes/feiyangqingyun/qss/";
-                        break;
-                    default:
-                        return;
-                }
-                qss = ReadFileText(path);
-                for (auto const &[a, b]: replace) {
-                    qss = qss.replace(a, b);
-                }
-            }
-
-            auto system_style = QStyleFactory::create(this->system_style_name);
-
-            if (themeId == 0) {
-                // system theme
-                qApp->setPalette(system_style->standardPalette());
-                qApp->setStyle(system_style);
-                qApp->setStyleSheet("");
-            } else {
-                if (themeId == 1 || themeId == 2 || themeId == 3) {
-                    // feiyangqingyun theme
-                    QString paletteColor = qss.mid(20, 7);
-                    qApp->setPalette(QPalette(paletteColor));
-                } else {
-                    // other theme
-                    qApp->setPalette(system_style->standardPalette());
-                }
-                qApp->setStyleSheet(qss);
-            }
-        } else {
-            // QStyleFactory
-            const auto &_style = QStyleFactory::create(theme);
-            if (_style != nullptr) {
-                qApp->setPalette(_style->standardPalette());
-                qApp->setStyle(_style);
-                qApp->setStyleSheet("");
-            }
-        }
-
-        current_theme = theme;
-    };
-    internal();
+    QString qss = ReadFileText(":/theme/material/base.qss.tpl");
+    qss.replace("%PRIMARY%", t.primary);
+    qss.replace("%PRIMARY_DARK%", t.primaryDark);
+    qss.replace("%ACCENT%", t.accent);
+    qss.replace("%MATERIAL_100%", t.material100);
+    qss.replace("%MATERIAL_300%", t.material300);
+    qss.replace("%WINDOW_BG%", windowBg);
+    qss.replace("%SURFACE_BG%", surfaceBg);
+    qss.replace("%TEXT_PRIMARY%", textPrimary);
+    qss.replace("%TEXT_SECONDARY%", textSecondary);
+    qss.replace("%DIVIDER%", divider);
+    qss.replace("%TEXT_ON_ACCENT%", textOnAccent);
 
     auto nekoray_css = ReadFileText(":/neko/neko.css");
-    qApp->setStyleSheet(qApp->styleSheet().append("\n").append(nekoray_css));
+    qApp->setStyleSheet(qss + "\n" + nekoray_css);
+
+    current_theme = themeName;
+    current_dark = dark;
 }

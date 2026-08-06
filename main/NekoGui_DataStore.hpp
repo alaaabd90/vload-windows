@@ -106,7 +106,8 @@ namespace NekoGui {
         bool mux_padding = false;
         int mux_concurrency = 8;
         bool mux_default_on = false;
-        QString theme = "0";
+        QString theme = "Pink_SSR"; // Material theme name, see main/MaterialPalette.hpp
+        bool dark_mode = false;
         int language = 0;
         QString mw_size = "";
         bool check_include_pre = false;

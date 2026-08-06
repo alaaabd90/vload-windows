@@ -234,8 +234,15 @@ set(PROJECT_SOURCES
         ui/widget/GroupItem.h
         ui/widget/GroupItem.ui
 
+        ui/material/PreferenceRow.hpp
+        ui/material/ConnectFab.hpp
+        ui/material/StatsBar.hpp
+        ui/material/CardItemDelegate.hpp
+        ui/material/CardListWidget.hpp
+        ui/material/NavDrawer.hpp
+        main/MaterialPalette.hpp
+
         res/neko.qrc
-        res/theme/feiyangqingyun/qss.qrc
         ${QV2RAY_RC}
 )
 
