@@ -8,12 +8,14 @@
 #include "main/GuiUtils.hpp"
 #include "main/NekoGui.hpp"
 #include "main/MaterialPalette.hpp"
+#include "sys/HwidManager.hpp"
 
 #include <QStyleFactory>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QTimer>
+#include <QClipboard>
 
 class ExtraCoreWidget : public QWidget {
 public:
@@ -199,6 +201,11 @@ DialogBasicSettings::DialogBasicSettings(QWidget *parent)
 
     D_LOAD_BOOL(skip_cert)
     ui->utlsFingerprint->setCurrentText(NekoGui::dataStore->utlsFingerprint);
+
+    ui->device_hwid->setText(HwidManager_Compute());
+    connect(ui->device_hwid_copy, &QPushButton::clicked, this, [=] {
+        QApplication::clipboard()->setText(ui->device_hwid->text());
+    });
 }
 
 DialogBasicSettings::~DialogBasicSettings() {

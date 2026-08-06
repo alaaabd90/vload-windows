@@ -153,6 +153,8 @@ set(PROJECT_SOURCES
         fmt/Bean2External.cpp
         fmt/Bean2Link.cpp
         fmt/Link2Bean.cpp
+        fmt/LockedProfileCrypto.hpp
+        fmt/LockedProfileCrypto.cpp
         fmt/ChainBean.hpp # translate
         fmt/LoadBalanceBean.hpp # translate
 
@@ -160,6 +162,8 @@ set(PROJECT_SOURCES
 
         sys/ExternalProcess.cpp
         sys/AutoRun.cpp
+        sys/HwidManager.hpp
+        sys/HwidManager.cpp
 
         ui/ThemeManager.cpp
         ui/Icon.cpp

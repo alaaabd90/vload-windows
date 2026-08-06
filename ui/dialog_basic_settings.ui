@@ -708,6 +708,29 @@
          </layout>
         </widget>
        </item>
+       <item>
+        <widget class="QGroupBox" name="hwidBox">
+         <property name="title">
+          <string>Device HWID</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_hwid">
+          <item>
+           <widget class="MyLineEdit" name="device_hwid">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="device_hwid_copy">
+            <property name="text">
+             <string>Copy</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>

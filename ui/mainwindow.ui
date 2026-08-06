@@ -452,6 +452,8 @@
      <addaction name="separator"/>
      <addaction name="menu_copy_links"/>
      <addaction name="menu_copy_links_nkr"/>
+     <addaction name="separator"/>
+     <addaction name="menu_export_locked"/>
     </widget>
     <widget class="QMenu" name="menuCurrent_Group">
      <property name="title">
@@ -478,6 +480,7 @@
     </widget>
     <addaction name="menu_add_from_input"/>
     <addaction name="menu_add_from_clipboard"/>
+    <addaction name="menu_import_locked"/>
     <addaction name="separator"/>
     <addaction name="menu_start"/>
     <addaction name="menu_stop"/>
@@ -562,6 +565,11 @@
     <string notr="true">Del</string>
    </property>
   </action>
+  <action name="menu_import_locked">
+   <property name="text">
+    <string>Import Locked (.vloadp)...</string>
+   </property>
+  </action>
   <action name="menu_add_from_clipboard2">
    <property name="text">
     <string>Add profile from clipboard</string>
@@ -615,6 +623,11 @@
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+E</string>
+   </property>
+  </action>
+  <action name="menu_export_locked">
+   <property name="text">
+    <string>Export Locked (.vloadp)...</string>
    </property>
   </action>
   <action name="menu_reset_traffic">

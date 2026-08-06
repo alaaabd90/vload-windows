@@ -46,6 +46,7 @@ namespace NekoGui {
         int id = -1;
         int gid = 0;
         int latency = 0;
+        bool lockedImport = false; // imported from a .vloadp locked profile - suppress type/address, block editing
         std::shared_ptr<NekoGui_fmt::AbstractBean> bean;
         std::shared_ptr<NekoGui_traffic::TrafficData> traffic_data = std::make_shared<NekoGui_traffic::TrafficData>("");
 

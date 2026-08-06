@@ -7,6 +7,8 @@
 #include "sub/GroupUpdater.hpp"
 #include "sys/ExternalProcess.hpp"
 #include "sys/AutoRun.hpp"
+#include "sys/HwidManager.hpp"
+#include "fmt/LockedProfileCrypto.hpp"
 
 #include "ui/ThemeManager.hpp"
 #include "ui/Icon.hpp"
@@ -51,6 +53,7 @@
 #include <QMessageBox>
 #include <QDir>
 #include <QFileInfo>
+#include <QFileDialog>
 
 void UI_InitMainWindow() {
     mainwindow = new MainWindow;
@@ -1089,7 +1092,7 @@ void MainWindow::refresh_proxy_list_impl_refresh_data(const int &id) {
 
         ui->proxyListTable->setRowContent(
             row, profileId, profile->bean->name, profile->bean->DisplayAddress(),
-            typeAndStatus, QColor(accent), isRunning, /*lockedImport*/ false);
+            typeAndStatus, QColor(accent), isRunning, profile->lockedImport);
     }
 }
 
@@ -1103,8 +1106,106 @@ void MainWindow::on_proxyListTable_itemDoubleClicked(QListWidgetItem *item) {
         refresh_status();
         return;
     }
+    auto profile = NekoGui::profileManager->GetProfile(id);
+    if (profile != nullptr && profile->lockedImport) {
+        // Matches ConfigurationFragment.kt: a successfully-imported locked
+        // profile can be used but not inspected/edited.
+        return;
+    }
     auto dialog = new DialogEditProfile("", id, this);
     connect(dialog, &QDialog::finished, dialog, &QDialog::deleteLater);
+}
+
+void MainWindow::on_menu_export_locked_triggered() {
+    auto ents = get_now_selected_list();
+    if (ents.count() != 1) return;
+    auto ent = ents.first();
+
+    bool ok;
+    auto targetHwid = QInputDialog::getText(this, tr("Export Locked"),
+                                             tr("Target device's HWID (16 hex characters):"),
+                                             QLineEdit::Normal, "", &ok)
+                           .trimmed()
+                           .toUpper();
+    if (!ok || targetHwid.isEmpty()) return;
+    if (targetHwid.length() != 16) {
+        MessageBoxWarning(tr("Export Locked"), tr("HWID must be 16 hex characters"));
+        return;
+    }
+
+    auto link = ent->bean->ToNekorayShareLink(ent->type);
+    auto encrypted = NekoGui_fmt::LockedProfileCrypto_EncryptForHwid(link, targetHwid);
+    if (encrypted.isEmpty()) {
+        MessageBoxWarning(tr("Export Locked"), tr("Encryption failed"));
+        return;
+    }
+
+    auto fn = QFileDialog::getSaveFileName(this, tr("Export Locked"),
+                                            ent->bean->name + ".vloadp", "*.vloadp");
+    if (fn.isEmpty()) return;
+    if (!fn.endsWith(".vloadp")) fn += ".vloadp";
+
+    QFile f(fn);
+    if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate) || f.write(encrypted) < 0) {
+        MessageBoxWarning(tr("Export Locked"), f.errorString());
+        return;
+    }
+    f.close();
+}
+
+void MainWindow::on_menu_import_locked_triggered() {
+    auto fn = QFileDialog::getOpenFileName(this, tr("Import Locked"), "", "*.vloadp");
+    if (fn.isEmpty()) return;
+
+    QFile f(fn);
+    if (!f.open(QIODevice::ReadOnly)) {
+        MessageBoxWarning(tr("Import Locked"), f.errorString());
+        return;
+    }
+    auto content = f.readAll();
+    f.close();
+
+    auto deviceHwid = HwidManager_Compute();
+    auto result = NekoGui_fmt::LockedProfileCrypto_TryDecrypt(content, deviceHwid);
+    switch (result.type) {
+        case NekoGui_fmt::LockedProfileResultType::NotLocked:
+            MessageBoxWarning(tr("Import Locked"), tr("Not a valid locked-profile (.vloadp) file"));
+            return;
+        case NekoGui_fmt::LockedProfileResultType::WrongDevice:
+            MessageBoxWarning(tr("Import Locked"),
+                               tr("This profile is locked to a different device (%1). This device's HWID is %2.")
+                                   .arg(result.lockedToHwid, deviceHwid));
+            return;
+        case NekoGui_fmt::LockedProfileResultType::Error:
+            MessageBoxWarning(tr("Import Locked"), result.error);
+            return;
+        case NekoGui_fmt::LockedProfileResultType::Decrypted:
+            break;
+    }
+
+    // Same "nekoray://" decode as GroupUpdater's RawUpdater, done directly and
+    // synchronously here since we already have the single decrypted link -
+    // no need to go through the async subscription-update machinery.
+    auto link = QUrl(result.plaintext);
+    if (!link.isValid()) {
+        MessageBoxWarning(tr("Import Locked"), tr("Decrypted content is not a valid profile link"));
+        return;
+    }
+    auto ent = NekoGui::ProfileManager::NewProxyEntity(link.host());
+    if (ent->bean->version == -114514) {
+        MessageBoxWarning(tr("Import Locked"), tr("Unknown profile type"));
+        return;
+    }
+    auto j = DecodeB64IfValid(link.fragment().toUtf8(), QByteArray::Base64UrlEncoding);
+    if (j.isEmpty()) {
+        MessageBoxWarning(tr("Import Locked"), tr("Decrypted content is not a valid profile link"));
+        return;
+    }
+    ent->bean->FromJsonBytes(j);
+    ent->lockedImport = true;
+    ent->gid = NekoGui::dataStore->current_group;
+    NekoGui::profileManager->AddProfile(ent);
+    refresh_proxy_list();
 }
 
 void MainWindow::on_menu_add_from_input_triggered() {
