@@ -119,7 +119,14 @@ protected:
         int row_src = currentRow();
         if (row_src < 0 || row_src >= row2Id.size()) return;
         auto id_src = row2Id[row_src];
+        // QDropEvent::position() is Qt6-only (QSinglePointEvent); Qt5 (the
+        // Linux job builds against 5.12) only has pos(). Both give the
+        // same widget-local point for a drop event.
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
         auto *dropItem = itemAt(event->position().toPoint());
+#else
+        auto *dropItem = itemAt(event->pos());
+#endif
         if (dropItem == nullptr) return; // dropped below the last row - no-op, matches MyTableWidget
         auto row_dst = this->row(dropItem);
 

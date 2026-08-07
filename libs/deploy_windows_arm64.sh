@@ -11,7 +11,15 @@ cp $BUILD/nekobox.exe $DEST
 
 #### deploy qt & DLL runtime ####
 pushd $DEST
-windeployqt nekobox.exe --no-compiler-runtime --no-system-d3d-compiler --no-opengl-sw --verbose 2
+# Called by full path rather than bare "windeployqt" - install-qt-action's
+# set-env adds Qt's bin dir to GITHUB_PATH for *later steps*, but this
+# script runs bash from within the same "Generate MakeFile and Build" step
+# that installed Qt, and that PATH update doesn't reliably reach a bash
+# subshell mid-step on Windows runners (confirmed: "windeployqt: command
+# not found", exit 127, even though the arm64 app itself built and linked
+# successfully). $QT_ROOT_DIR itself *is* already reliable here - it's used
+# below for the OpenSSL DLLs - so use it directly instead of trusting PATH.
+"$QT_ROOT_DIR/bin/windeployqt.exe" nekobox.exe --no-compiler-runtime --no-system-d3d-compiler --no-opengl-sw --verbose 2
 rm -rf translations
 rm -rf libEGL.dll libGLESv2.dll Qt6Pdf.dll
 
