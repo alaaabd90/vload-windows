@@ -214,6 +214,13 @@ jobs:
     name: Pack & Publish Release
     if: github.event.inputs.artifact-pack != 'y'
     runs-on: ubuntu-latest
+    # Default GITHUB_TOKEN is read-only unless a job explicitly requests
+    # more - confirmed via a real run failing at the "Release" step with
+    # "403 Resource not accessible by integration" from ghr's release-create
+    # call, even though every build job succeeded. contents:write is the
+    # minimum scope ghr needs to create/upload a release.
+    permissions:
+      contents: write
     needs:
       - build-cpp
       - build-go
