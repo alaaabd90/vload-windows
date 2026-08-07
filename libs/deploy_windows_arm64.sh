@@ -31,11 +31,17 @@ echo "Using windeployqt: $WINDEPLOYQT"
 rm -rf translations
 rm -rf libEGL.dll libGLESv2.dll Qt6Pdf.dll
 
-# QT_ROOT_DIR is set by install-qt-action (v4+) directly to the Qt install's
-# root, unlike the x64 job's hand-rolled qtsdk/Qt layout - and OpenSSL DLL
-# filenames vary by architecture (e.g. -x64 vs -arm64 suffix), so this globs
-# rather than hardcoding a name, since it hasn't been verified against an
-# actual arm64 Qt SDK layout yet.
+# Confirmed via an actual built package: the official win64_msvc2022_arm64_cross_compiled
+# Qt SDK doesn't ship libcrypto/libssl or a qopensslbackend.dll TLS plugin at
+# all (unlike the x64 job's custom SDK repack, which bundles OpenSSL) - these
+# globs always no-op on arm64. This is harmless, not a bug to work around:
+# Qt6's TLS backend is a runtime-selected plugin, windeployqt already deployed
+# qschannelbackend.dll (Windows' native TLS stack) as the available backend,
+# and proxy-protocol TLS (VMess/VLESS/Trojan/REALITY/etc.) goes through the
+# Go core's own statically-linked crypto/tls, entirely independent of Qt.
+# Kept as a no-op/best-effort in case a future official arm64 Qt SDK adds
+# OpenSSL support - harmless either way since windeployqt already guarantees
+# a working TLS backend is present.
 cp "$QT_ROOT_DIR"/bin/libcrypto-3*.dll . 2>/dev/null || true
 cp "$QT_ROOT_DIR"/bin/libssl-3*.dll . 2>/dev/null || true
 
