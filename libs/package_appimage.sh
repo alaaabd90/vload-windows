@@ -28,7 +28,11 @@ chmod +x nekobox.AppDir/AppRun
 
 # build
 
-curl -fLSO https://github.com/AppImage/AppImageKit/releases/latest/download/appimagetool-x86_64.AppImage
+# AppImageKit (the old repo) no longer carries this asset on its "latest"
+# release (confirmed: /releases/latest redirects to tag 13, which 404s on
+# the file too) - the tool moved to the AppImage/appimagetool repo's
+# rolling "continuous" release tag.
+curl -fLSO https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
 chmod +x appimagetool-x86_64.AppImage
 ./appimagetool-x86_64.AppImage nekobox.AppDir
 
