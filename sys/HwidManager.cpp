@@ -4,6 +4,8 @@
 #include <QSettings>
 #include <QSysInfo>
 
+#ifdef Q_OS_WIN
+
 #include <windows.h>
 
 namespace {
@@ -30,3 +32,15 @@ QString HwidManager_Compute() {
     auto digest = QCryptographicHash::hash(input.toUtf8(), QCryptographicHash::Sha256);
     return QString::fromLatin1(digest.left(8).toHex()).toUpper();
 }
+
+#else
+
+// HWID derivation is Windows-only for now (registry MachineGuid + volume
+// serial, both Windows-native concepts) - not yet ported to Linux/macOS.
+QString HwidManager_Compute() {
+    auto fingerprint = QSysInfo::prettyProductName() + "/" + QSysInfo::kernelVersion() + "/" + QSysInfo::buildAbi();
+    auto digest = QCryptographicHash::hash(fingerprint.toUtf8(), QCryptographicHash::Sha256);
+    return QString::fromLatin1(digest.left(8).toHex()).toUpper();
+}
+
+#endif

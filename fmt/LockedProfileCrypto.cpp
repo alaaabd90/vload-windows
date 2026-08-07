@@ -3,6 +3,8 @@
 #include <QCryptographicHash>
 #include <QRandomGenerator>
 
+#ifdef Q_OS_WIN
+
 #include <windows.h>
 #include <bcrypt.h>
 
@@ -129,3 +131,21 @@ namespace NekoGui_fmt {
         return {LockedProfileResultType::Decrypted, QString::fromUtf8(plainBytes), {}, {}};
     }
 } // namespace NekoGui_fmt
+
+#else
+
+// Locked-profile export/import is Windows-only for now (Windows CNG/bcrypt
+// backs the AES-256-GCM impl above) - not yet ported to Linux/macOS.
+// Stubbed here so non-Windows builds still link instead of failing on
+// windows.h; callers see NotLocked/empty output rather than a crash.
+namespace NekoGui_fmt {
+    QByteArray LockedProfileCrypto_EncryptForHwid(const QString &, const QString &) {
+        return {};
+    }
+
+    LockedProfileDecryptResult LockedProfileCrypto_TryDecrypt(const QByteArray &, const QString &) {
+        return {LockedProfileResultType::NotLocked, {}, {}, {}};
+    }
+} // namespace NekoGui_fmt
+
+#endif
