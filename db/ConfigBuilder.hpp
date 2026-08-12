@@ -43,6 +43,15 @@ namespace NekoGui {
         QJsonArray inbounds;
         QJsonArray outbounds;
         QJsonArray endpoints; // sing-box config-level "endpoints" (currently: WireGuard only)
+
+        // Set by BuildLoadBalance to a priority-mode weighted outbound tag
+        // (see sing-box-vload's protocol/group/weighted.go) when the
+        // profile is a load-balance one; empty otherwise, in which case
+        // dns-remote just detours through the normal tagProxy like every
+        // other profile type. DNS wants one consistent network with
+        // failover, not both slots' answers mixed per query - see
+        // BuildLoadBalance's own comment for why.
+        QString dnsProxyTag;
     };
 
     std::shared_ptr<BuildConfigResult> BuildConfig(const std::shared_ptr<ProxyEntity> &ent, bool forTest, bool forExport);

@@ -244,6 +244,26 @@ namespace NekoGui {
                           }},
         };
 
+        // Same two slots, but DNS wants one consistent network with
+        // failover rather than both slots' answers mixed per query - two
+        // adapters can genuinely disagree (split-horizon DNS, different
+        // upstream results), so racing/splitting per-lookup undermines
+        // stable browsing instead of helping it. mode="priority" always
+        // prefers slot A and only fails over to slot B when slot A's
+        // circuit breaker has actually tripped, never hedges - see
+        // sing-box-vload's protocol/group/weighted.go. Bulk traffic through
+        // "proxy" above is unaffected and keeps combining both slots.
+        status->outbounds += QJsonObject{
+            {"type", "weighted"},
+            {"tag", "dns-proxy"},
+            {"mode", "priority"},
+            {"outbounds", QJsonArray{
+                              QJsonObject{{"outbound", tagA}},
+                              QJsonObject{{"outbound", tagB}},
+                          }},
+        };
+        status->dnsProxyTag = "dns-proxy";
+
         status->ent->traffic_data->id = status->ent->id;
         status->ent->traffic_data->tag = "proxy";
         status->result->outboundStat = status->ent->traffic_data;
@@ -674,7 +694,7 @@ namespace NekoGui {
                 {"address_resolver", "dns-local"},
                 {"strategy", dataStore->routing->remote_dns_strategy},
                 {"address", dataStore->routing->remote_dns},
-                {"detour", tagProxy},
+                {"detour", status->dnsProxyTag.isEmpty() ? tagProxy : status->dnsProxyTag},
             };
 
         // Direct
