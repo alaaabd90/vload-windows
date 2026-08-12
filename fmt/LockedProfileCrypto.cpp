@@ -14,10 +14,11 @@ namespace NekoGui_fmt {
     namespace {
         constexpr int GCM_TAG_BYTES = 16;
         constexpr int GCM_IV_BYTES = 12;
-        constexpr int HWID_BYTES = 16;
+        constexpr int HWID_BYTES = LockedProfileHwidChars;
         const QByteArray MAGIC = QByteArrayLiteral("VLDP");
-        constexpr char VERSION = 0x01;
-        constexpr int HEADER_SIZE = 4 + 1 + HWID_BYTES + GCM_IV_BYTES; // 33
+        constexpr char VERSION = 0x02;
+        constexpr char VERSION_1_LEGACY = 0x01;
+        constexpr int HEADER_SIZE = 4 + 1 + HWID_BYTES + GCM_IV_BYTES; // 49
 
         QByteArray DeriveKey(const QString &hwid) {
             return QCryptographicHash::hash(hwid.toUpper().toUtf8(), QCryptographicHash::Sha256);
@@ -104,11 +105,17 @@ namespace NekoGui_fmt {
     }
 
     LockedProfileDecryptResult LockedProfileCrypto_TryDecrypt(const QByteArray &content, const QString &deviceHwid) {
-        if (content.size() < HEADER_SIZE + GCM_TAG_BYTES || !content.startsWith(MAGIC)) {
+        if (content.size() < 5 || !content.startsWith(MAGIC)) {
             return {LockedProfileResultType::NotLocked, {}, {}, {}};
         }
         auto version = content[4];
-        if (version != VERSION) {
+        if (version == VERSION_1_LEGACY) {
+            return {LockedProfileResultType::Error, {}, {},
+                    QStringLiteral("This profile was locked with an older version of the app and can't be "
+                                   "matched against this device's current HWID. Ask the sender to "
+                                   "re-export and re-lock it.")};
+        }
+        if (version != VERSION || content.size() < HEADER_SIZE + GCM_TAG_BYTES) {
             return {LockedProfileResultType::Error, {}, {}, QStringLiteral("Unsupported locked-profile format version %1").arg(int(version))};
         }
 

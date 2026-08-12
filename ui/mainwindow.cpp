@@ -1146,13 +1146,13 @@ void MainWindow::on_menu_export_locked_triggered() {
 
     bool ok;
     auto targetHwid = QInputDialog::getText(this, tr("Export Locked"),
-                                             tr("Target device's HWID (16 hex characters):"),
+                                             tr("Target device's HWID (%1 hex characters):").arg(NekoGui_fmt::LockedProfileHwidChars),
                                              QLineEdit::Normal, "", &ok)
                            .trimmed()
                            .toUpper();
     if (!ok || targetHwid.isEmpty()) return;
-    if (targetHwid.length() != 16) {
-        MessageBoxWarning(tr("Export Locked"), tr("HWID must be 16 hex characters"));
+    if (targetHwid.length() != NekoGui_fmt::LockedProfileHwidChars) {
+        MessageBoxWarning(tr("Export Locked"), tr("HWID must be %1 hex characters").arg(NekoGui_fmt::LockedProfileHwidChars));
         return;
     }
 

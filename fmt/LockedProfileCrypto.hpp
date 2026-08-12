@@ -10,10 +10,20 @@
 // the payload - matches Android's utils/LockedProfileCrypto.kt exactly so
 // .vloadp files move between phone and PC.
 //
-// Binary format: MAGIC("VLDP",4) | VERSION(1) | HWID(16 ASCII) | IV(12) | CIPHERTEXT
+// Binary format (VERSION 2): MAGIC("VLDP",4) | VERSION(1) | HWID(32 ASCII) | IV(12) | CIPHERTEXT
 // CIPHERTEXT is AES-256-GCM output with the 16-byte auth tag appended, same
 // layout javax.crypto.Cipher.doFinal() produces on the Android side.
+//
+// VERSION 1 files (16 ASCII HWID field, matching the pre-fix HwidManager's
+// shorter, FINGERPRINT-dependent digest on both platforms) are recognized
+// and rejected with a clear error rather than misparsed against the new
+// fixed field width - see HwidManager.cpp for why that format changed.
 namespace NekoGui_fmt {
+    // Public so UI input validation (the "lock for another device" HWID
+    // entry field) can check against the same length instead of a
+    // hand-copied magic number that could drift out of sync with this.
+    constexpr int LockedProfileHwidChars = 32;
+
     enum class LockedProfileResultType {
         NotLocked,
         WrongDevice,
