@@ -495,11 +495,18 @@ namespace NekoGui {
             outbound["domain_strategy"] = dataStore->routing->outbound_domain_strategy;
             // apply mux
             if (!muxApplied && needMux) {
+                // max_connections/min_streams (not max_streams) puts sing-box's
+                // mux in multi-connection mode: mux_concurrency real
+                // connections shared across streams, instead of every stream
+                // funneled through one socket - the single-connection mode
+                // made high-parallelism traffic bottleneck and made a single
+                // connection drop take every multiplexed stream down with it.
                 auto muxObj = QJsonObject{
                     {"enabled", true},
                     {"protocol", dataStore->mux_protocol},
                     {"padding", dataStore->mux_padding},
-                    {"max_streams", dataStore->mux_concurrency},
+                    {"max_connections", dataStore->mux_concurrency},
+                    {"min_streams", 4},
                 };
                 outbound["multiplex"] = muxObj;
                 muxApplied = true;
