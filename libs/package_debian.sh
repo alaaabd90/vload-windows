@@ -1,6 +1,8 @@
 #!/bin/bash
 
-version="$1"
+# Debian Policy requires the Version field to start with a digit; strip a
+# leading "v" from release tags like "v1.4.1-windows" so dpkg-deb accepts it.
+version="${1#v}"
 
 mkdir -p vload/DEBIAN
 mkdir -p vload/opt
