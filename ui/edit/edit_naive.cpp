@@ -13,7 +13,7 @@ EditNaive::~EditNaive() {
     delete ui;
 }
 
-void EditNaive::onStart(std::shared_ptr<NekoGui::ProxyEntity> _ent) {
+void EditNaive::onStart(std::shared_ptr<Vload::ProxyEntity> _ent) {
     this->ent = _ent;
     auto bean = this->ent->NaiveBean();
 

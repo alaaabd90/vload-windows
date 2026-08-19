@@ -32,7 +32,7 @@ void EditLoadBalance::RefreshAdapterList() {
     }
 }
 
-void EditLoadBalance::onStart(std::shared_ptr<NekoGui::ProxyEntity> _ent) {
+void EditLoadBalance::onStart(std::shared_ptr<Vload::ProxyEntity> _ent) {
     this->ent = _ent;
     auto bean = this->ent->LoadBalanceBean();
 
@@ -80,7 +80,7 @@ void EditLoadBalance::RefreshSlotLabel(bool slotA) {
         label->setText(tr("(no profile selected)"));
         return;
     }
-    auto profile = NekoGui::profileManager->GetProfile(profileId);
+    auto profile = Vload::profileManager->GetProfile(profileId);
     label->setText(profile == nullptr ? tr("(profile not found)") : profile->bean->DisplayTypeAndName());
 }
 

@@ -7,7 +7,7 @@ rm -rf $DEST
 mkdir -p $DEST
 
 #### copy exe ####
-cp $BUILD/nekobox.exe $DEST
+cp $BUILD/vload.exe $DEST
 
 #### deploy qt & DLL runtime ####
 pushd $DEST
@@ -27,7 +27,7 @@ if [ -z "$WINDEPLOYQT" ]; then
   exit 1
 fi
 echo "Using windeployqt: $WINDEPLOYQT"
-"$WINDEPLOYQT" nekobox.exe --no-compiler-runtime --no-system-d3d-compiler --no-opengl-sw --verbose 2
+"$WINDEPLOYQT" vload.exe --no-compiler-runtime --no-system-d3d-compiler --no-opengl-sw --verbose 2
 rm -rf translations
 rm -rf libEGL.dll libGLESv2.dll Qt6Pdf.dll
 

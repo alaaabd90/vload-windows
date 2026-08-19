@@ -2,7 +2,7 @@
 
 #include "fmt/AbstractBean.hpp"
 
-namespace NekoGui_fmt {
+namespace Vload_fmt {
     // Mieru, like Trojan-Go, has no native sing-box outbound. Android's own
     // implementation (fmt/mieru/MieruBean.java) shells out to an external
     // "mieru-client" plugin binary and routes through it via a local SOCKS
@@ -29,4 +29,4 @@ namespace NekoGui_fmt {
 
         ExternalBuildResult BuildExternal(int mapping_port, int socks_port, int external_stat) override;
     };
-} // namespace NekoGui_fmt
+} // namespace Vload_fmt

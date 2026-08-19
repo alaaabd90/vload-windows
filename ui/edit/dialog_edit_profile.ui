@@ -359,6 +359,16 @@
              </item>
             </widget>
            </item>
+           <item row="4" column="1">
+            <widget class="QCheckBox" name="tcp_fast_open">
+             <property name="toolTip">
+              <string>Reduces one round trip for the initial TCP handshake. Both the client and the server's OS/network path must support it, otherwise it has no effect.</string>
+             </property>
+             <property name="text">
+              <string>TCP Fast Open</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </item>
         </layout>
@@ -498,6 +508,38 @@ security (QUIC)</string>
             </widget>
            </item>
            <item>
+            <widget class="QCheckBox" name="tls_fragment">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Splits the TLS ClientHello into multiple TCP segments to evade SNI-based filtering. May not help, or may break the connection, depending on the network.</string>
+             </property>
+             <property name="text">
+              <string>TLS Fragment</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="enable_ech">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>Encrypted Client Hello - hides the SNI from network observers. Server must support it. Paste the ECH config (from the server) below if needed.</string>
+             </property>
+             <property name="text">
+              <string>ECH</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="Line" name="line">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -556,6 +598,19 @@ security (QUIC)</string>
            </item>
            <item row="1" column="1">
             <widget class="MyLineEdit" name="alpn"/>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="ech_config_l">
+             <property name="toolTip">
+              <string>ECH config, as given by the server. One or more lines, base64 or PEM.</string>
+             </property>
+             <property name="text">
+              <string notr="true">ECH Config</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="MyLineEdit" name="ech_config"/>
            </item>
           </layout>
          </item>

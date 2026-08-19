@@ -1,7 +1,7 @@
 #include "db/ProxyEntity.hpp"
 #include "fmt/includes.h"
 
-namespace NekoGui_fmt {
+namespace Vload_fmt {
     void V2rayStreamSettings::BuildStreamSettingsSingBox(QJsonObject *outbound) {
         // https://sing-box.sagernet.org/configuration/shared/v2ray-transport
 
@@ -47,7 +47,7 @@ namespace NekoGui_fmt {
         // 对应字段 tls
         if (security == "tls") {
             QJsonObject tls{{"enabled", true}};
-            if (allow_insecure || NekoGui::dataStore->skip_cert) tls["insecure"] = true;
+            if (allow_insecure || Vload::dataStore->skip_cert) tls["insecure"] = true;
             if (!sni.trimmed().isEmpty()) tls["server_name"] = sni;
             if (!certificate.trimmed().isEmpty()) {
                 tls["certificate"] = certificate.trimmed();
@@ -70,12 +70,28 @@ namespace NekoGui_fmt {
                     {"fingerprint", fp},
                 };
             }
+            if (enable_ech) {
+                QJsonObject ech{{"enabled", true}};
+                if (!ech_config.trimmed().isEmpty()) {
+                    ech["config"] = QList2QJsonArray(ech_config.trimmed().split("\n"));
+                }
+                tls["ech"] = ech;
+            }
+            if (tls_fragment) {
+                // record_fragment must ALSO be set for sing-box to apply
+                // fragmentation at all - fragment alone has no effect (see
+                // this field's own comment in V2RayStreamSettings.hpp).
+                tls["fragment"] = true;
+                tls["record_fragment"] = true;
+            }
             outbound->insert("tls", tls);
         }
 
         if (outbound->value("type").toString() == "vmess" || outbound->value("type").toString() == "vless") {
             outbound->insert("packet_encoding", packet_encoding);
         }
+
+        if (tcp_fast_open) outbound->insert("tcp_fast_open", true);
     }
 
     CoreObjOutboundBuildResult SocksHttpBean::BuildCoreObjSingBox() {
@@ -361,4 +377,4 @@ namespace NekoGui_fmt {
 
         return result;
     }
-} // namespace NekoGui_fmt
+} // namespace Vload_fmt

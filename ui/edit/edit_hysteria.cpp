@@ -14,7 +14,7 @@ EditHysteria::~EditHysteria() {
     delete ui;
 }
 
-void EditHysteria::onStart(std::shared_ptr<NekoGui::ProxyEntity> _ent) {
+void EditHysteria::onStart(std::shared_ptr<Vload::ProxyEntity> _ent) {
     this->ent = _ent;
     auto bean = this->ent->HysteriaBean();
 

@@ -14,7 +14,7 @@ EditAnyTLS::~EditAnyTLS() {
     delete ui;
 }
 
-void EditAnyTLS::onStart(std::shared_ptr<NekoGui::ProxyEntity> _ent) {
+void EditAnyTLS::onStart(std::shared_ptr<Vload::ProxyEntity> _ent) {
     this->ent = _ent;
     auto bean = this->ent->AnyTLSBean();
 

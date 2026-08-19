@@ -2,7 +2,7 @@
 
 #include "fmt/AbstractBean.hpp"
 
-namespace NekoGui_fmt {
+namespace Vload_fmt {
     // sing-box 1.13 models WireGuard as a config-level "endpoint", not a plain
     // outbound (see include/wireguard.go upstream - the legacy outbound was
     // removed in 1.13.0). BuildCoreObjSingBox() still returns the JSON object
@@ -37,4 +37,4 @@ namespace NekoGui_fmt {
 
         CoreObjOutboundBuildResult BuildCoreObjSingBox() override;
     };
-} // namespace NekoGui_fmt
+} // namespace Vload_fmt

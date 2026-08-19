@@ -5,7 +5,7 @@
 
 #ifndef NKR_NO_GRPC
 
-#include "main/NekoGui.hpp"
+#include "main/Vload.hpp"
 
 #include <QCoreApplication>
 #include <QNetworkAccessManager>
@@ -56,7 +56,7 @@ namespace QtGrpc {
 
         QString url_base;
         QString serviceName;
-        QByteArray nekoray_auth;
+        QByteArray vload_auth;
 
         // async
         QNetworkReply *post(const QString &method, const QString &service, const QByteArray &args) {
@@ -74,7 +74,7 @@ namespace QtGrpc {
             request.setRawHeader(GrpcAcceptEncodingHeader, QByteArray{"identity,deflate,gzip"});
             request.setRawHeader(AcceptEncodingHeader, QByteArray{"identity,gzip"});
             request.setRawHeader(TEHeader, QByteArray{"trailers"});
-            request.setRawHeader("nekoray_auth", nekoray_auth);
+            request.setRawHeader("vload_auth", vload_auth);
 
             QByteArray msg(GrpcMessageSizeHeaderSize, '\0');
             *reinterpret_cast<int *>(msg.data() + 1) = qToBigEndian((int) args.size());
@@ -139,9 +139,9 @@ namespace QtGrpc {
         }
 
     public:
-        Http2GrpcChannelPrivate(const QString &url_, const QString &nekoray_auth_, const QString &serviceName_) {
+        Http2GrpcChannelPrivate(const QString &url_, const QString &vload_auth_, const QString &serviceName_) {
             url_base = "http://" + url_;
-            nekoray_auth = nekoray_auth_.toLatin1();
+            vload_auth = vload_auth_.toLatin1();
             serviceName = serviceName_;
             //
             thread = new QThread;
@@ -161,7 +161,7 @@ namespace QtGrpc {
         QNetworkReply::NetworkError Call(const QString &methodName,
                                          const google::protobuf::Message &req, google::protobuf::Message *rsp,
                                          int timeout_ms = 0) {
-            if (!NekoGui::dataStore->core_running) return QNetworkReply::NetworkError(-1919);
+            if (!Vload::dataStore->core_running) return QNetworkReply::NetworkError(-1919);
 
             std::string reqStr;
             req.SerializeToString(&reqStr);
@@ -195,7 +195,7 @@ namespace QtGrpc {
     };
 } // namespace QtGrpc
 
-namespace NekoGui_rpc {
+namespace Vload_rpc {
 
     Client::Client(std::function<void(const QString &)> onError, const QString &target, const QString &token) {
         this->make_grpc_channel = [=]() { return std::make_unique<QtGrpc::Http2GrpcChannelPrivate>(target, token, "libcore.LibcoreService"); };
@@ -261,7 +261,7 @@ namespace NekoGui_rpc {
         auto status = default_grpc_channel->Call("ListConnections", request, &reply, 500);
 
         if (status == QNetworkReply::NoError) {
-            return reply.nekoray_connections_json();
+            return reply.vload_connections_json();
         } else {
             return "";
         }
@@ -303,6 +303,6 @@ namespace NekoGui_rpc {
             return reply;
         }
     }
-} // namespace NekoGui_rpc
+} // namespace Vload_rpc
 
 #endif

@@ -2,7 +2,7 @@
 
 #include "fmt/AbstractBean.hpp"
 
-namespace NekoGui_fmt {
+namespace Vload_fmt {
     // Hysteria v1 (distinct from Hysteria2, which is QUICBean::proxy_Hysteria2)
     class HysteriaBean : public AbstractBean {
     public:
@@ -40,4 +40,4 @@ namespace NekoGui_fmt {
 
         CoreObjOutboundBuildResult BuildCoreObjSingBox() override;
     };
-} // namespace NekoGui_fmt
+} // namespace Vload_fmt

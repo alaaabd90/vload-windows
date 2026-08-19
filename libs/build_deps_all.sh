@@ -28,7 +28,7 @@ clean() {
 }
 
 #### ZXing v2.0.0 ####
-curl -L -o dl.zip https://github.com/nu-book/zxing-cpp/archive/refs/tags/v2.0.0.zip
+curl --ssl-no-revoke -L -o dl.zip https://github.com/nu-book/zxing-cpp/archive/refs/tags/v2.0.0.zip
 unzip dl.zip
 
 cd zxing-*
@@ -41,7 +41,7 @@ ninja && ninja install
 cd ../..
 
 #### yaml-cpp ####
-curl -L -o dl.zip https://github.com/jbeder/yaml-cpp/archive/refs/tags/yaml-cpp-0.7.0.zip
+curl --ssl-no-revoke -L -o dl.zip https://github.com/jbeder/yaml-cpp/archive/refs/tags/yaml-cpp-0.7.0.zip
 unzip dl.zip
 
 cd yaml-*
@@ -85,7 +85,7 @@ cd ../..
 # changes; the cross-compiled libprotobuf* still links fine into the
 # target-arch app.
 if [ "$TARGET_ARCH" == "arm64" ]; then
-  curl -L -o protoc-host.zip https://github.com/protocolbuffers/protobuf/releases/download/v21.4/protoc-21.4-win64.zip
+  curl --ssl-no-revoke -L -o protoc-host.zip https://github.com/protocolbuffers/protobuf/releases/download/v21.4/protoc-21.4-win64.zip
   unzip -o -j protoc-host.zip bin/protoc.exe -d $INSTALL_PREFIX/bin
   rm -f protoc-host.zip
 fi

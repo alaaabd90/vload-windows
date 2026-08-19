@@ -2,7 +2,7 @@
 
 #include "AbstractBean.hpp"
 
-namespace NekoGui_fmt {
+namespace Vload_fmt {
     class V2rayStreamSettings : public JsonStore {
     public:
         QString network = "tcp";
@@ -28,6 +28,17 @@ namespace NekoGui_fmt {
         QString reality_spx = "";
         // multiplex
         int multiplex_status = 0;
+        // dialer-level (not TLS-specific, but there's no other per-profile
+        // settings surface to hang it off - matches vload-android's
+        // StandardV2RayBean.tcpFastOpen)
+        bool tcp_fast_open = false;
+        // tls fragment - sing-box only fragments a TLS record if
+        // record_fragment is ALSO set, fragment alone has no effect (see
+        // vload-android's V2RayFmt.kt comment on this exact gotcha)
+        bool tls_fragment = false;
+        // ech (Encrypted Client Hello)
+        bool enable_ech = false;
+        QString ech_config = "";
 
         V2rayStreamSettings() : JsonStore() {
             _add(new configItem("net", &network, itemType::string));
@@ -47,6 +58,10 @@ namespace NekoGui_fmt {
             _add(new configItem("sid", &reality_sid, itemType::string));
             _add(new configItem("spx", &reality_spx, itemType::string));
             _add(new configItem("mux_s", &multiplex_status, itemType::integer));
+            _add(new configItem("tfo", &tcp_fast_open, itemType::boolean));
+            _add(new configItem("tls_frag", &tls_fragment, itemType::boolean));
+            _add(new configItem("ech", &enable_ech, itemType::boolean));
+            _add(new configItem("ech_cfg", &ech_config, itemType::string));
         }
 
         void BuildStreamSettingsSingBox(QJsonObject *outbound);
@@ -57,9 +72,9 @@ namespace NekoGui_fmt {
         auto stream_item = bean->_get("stream");
         if (stream_item != nullptr) {
             auto stream_store = (JsonStore *) stream_item->ptr;
-            auto stream = (NekoGui_fmt::V2rayStreamSettings *) stream_store;
+            auto stream = (Vload_fmt::V2rayStreamSettings *) stream_store;
             return stream;
         }
         return nullptr;
     }
-} // namespace NekoGui_fmt
+} // namespace Vload_fmt

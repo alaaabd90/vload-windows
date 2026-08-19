@@ -1,6 +1,6 @@
 #pragma once
 
-namespace NekoGui {
+namespace Vload {
     namespace DomainMatcher {
         enum DomainMatcher {
             DEFAULT,
@@ -22,4 +22,4 @@ namespace NekoGui {
             SING_BOX,
         };
     }
-} // namespace NekoGui
+} // namespace Vload

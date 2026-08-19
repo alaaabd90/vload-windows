@@ -19,11 +19,11 @@
 
 // ext core
 
-std::list<std::shared_ptr<NekoGui_sys::ExternalProcess>> CreateExtCFromExtR(const std::list<std::shared_ptr<NekoGui_fmt::ExternalBuildResult>> &extRs, bool start) {
+std::list<std::shared_ptr<Vload_sys::ExternalProcess>> CreateExtCFromExtR(const std::list<std::shared_ptr<Vload_fmt::ExternalBuildResult>> &extRs, bool start) {
     // plz run and start in same thread
-    std::list<std::shared_ptr<NekoGui_sys::ExternalProcess>> l;
+    std::list<std::shared_ptr<Vload_sys::ExternalProcess>> l;
     for (const auto &extR: extRs) {
-        std::shared_ptr<NekoGui_sys::ExternalProcess> extC(new NekoGui_sys::ExternalProcess());
+        std::shared_ptr<Vload_sys::ExternalProcess> extC(new Vload_sys::ExternalProcess());
         extC->tag = extR->tag;
         extC->program = extR->program;
         extC->arguments = extR->arguments;
@@ -38,7 +38,7 @@ std::list<std::shared_ptr<NekoGui_sys::ExternalProcess>> CreateExtCFromExtR(cons
 // grpc
 
 #ifndef NKR_NO_GRPC
-using namespace NekoGui_rpc;
+using namespace Vload_rpc;
 #endif
 
 void MainWindow::setup_grpc() {
@@ -48,10 +48,10 @@ void MainWindow::setup_grpc() {
         [=](const QString &errStr) {
             MW_show_log("[Error] gRPC: " + errStr);
         },
-        "127.0.0.1:" + Int2String(NekoGui::dataStore->core_port), NekoGui::dataStore->core_token);
+        "127.0.0.1:" + Int2String(Vload::dataStore->core_port), Vload::dataStore->core_token);
 
     // Looper
-    runOnNewThread([=] { NekoGui_traffic::trafficLooper->Loop(); });
+    runOnNewThread([=] { Vload_traffic::trafficLooper->Loop(); });
 #endif
 }
 
@@ -67,9 +67,9 @@ void MainWindow::speedtest_current_group(int mode, bool test_group) {
     }
 
     auto profiles = get_selected_or_group();
-    if (test_group) profiles = NekoGui::profileManager->CurrentGroup()->ProfilesWithOrder();
+    if (test_group) profiles = Vload::profileManager->CurrentGroup()->ProfilesWithOrder();
     if (profiles.isEmpty()) return;
-    auto group = NekoGui::profileManager->CurrentGroup();
+    auto group = Vload::profileManager->CurrentGroup();
     if (group->archive) return;
 
     // menu_stop_testing
@@ -123,7 +123,7 @@ void MainWindow::speedtest_current_group(int mode, bool test_group) {
     runOnNewThread([this, profiles, mode, full_test_flags]() {
         QMutex lock_write;
         QMutex lock_return;
-        int threadN = NekoGui::dataStore->test_concurrent;
+        int threadN = Vload::dataStore->test_concurrent;
         int threadN_finished = 0;
         auto profiles_test = profiles; // copy
 
@@ -154,10 +154,10 @@ void MainWindow::speedtest_current_group(int mode, bool test_group) {
                     libcore::TestReq req;
                     req.set_mode((libcore::TestMode) mode);
                     req.set_timeout(10 * 1000);
-                    req.set_url(NekoGui::dataStore->test_latency_url.toStdString());
+                    req.set_url(Vload::dataStore->test_latency_url.toStdString());
 
                     //
-                    std::list<std::shared_ptr<NekoGui_sys::ExternalProcess>> extCs;
+                    std::list<std::shared_ptr<Vload_sys::ExternalProcess>> extCs;
                     QSemaphore extSem;
 
                     if (mode == libcore::TestMode::UrlTest || mode == libcore::FullTest) {
@@ -193,8 +193,8 @@ void MainWindow::speedtest_current_group(int mode, bool test_group) {
                         req.set_full_speed(full_test_flags.contains("3"));
                         req.set_full_in_out(full_test_flags.contains("4"));
 
-                        req.set_full_speed_url(NekoGui::dataStore->test_download_url.toStdString());
-                        req.set_full_speed_timeout(NekoGui::dataStore->test_download_timeout);
+                        req.set_full_speed_url(Vload::dataStore->test_download_url.toStdString());
+                        req.set_full_speed_timeout(Vload::dataStore->test_download_timeout);
                     } else if (mode == libcore::TcpPing) {
                         req.set_address(profile->bean->DisplayAddress().toStdString());
                     }
@@ -218,7 +218,7 @@ void MainWindow::speedtest_current_group(int mode, bool test_group) {
 
                     if (result.error().empty()) {
                         profile->latency = result.ms();
-                        if (profile->latency == 0) profile->latency = 1; // nekoray use 0 to represents not tested
+                        if (profile->latency == 0) profile->latency = 1; // vload use 0 to represents not tested
                     } else {
                         profile->latency = -1;
                     }
@@ -255,7 +255,7 @@ void MainWindow::speedtest_current() {
         libcore::TestReq req;
         req.set_mode(libcore::UrlTest);
         req.set_timeout(10 * 1000);
-        req.set_url(NekoGui::dataStore->test_latency_url.toStdString());
+        req.set_url(Vload::dataStore->test_latency_url.toStdString());
 
         bool rpcOK;
         auto result = defaultClient->Test(&rpcOK, req);
@@ -280,15 +280,15 @@ void MainWindow::speedtest_current() {
 
 void MainWindow::stop_core_daemon() {
 #ifndef NKR_NO_GRPC
-    NekoGui_rpc::defaultClient->Exit();
+    Vload_rpc::defaultClient->Exit();
 #endif
 }
 
-void MainWindow::neko_start(int _id) {
-    if (NekoGui::dataStore->prepare_exit) return;
+void MainWindow::vload_start(int _id) {
+    if (Vload::dataStore->prepare_exit) return;
 
     auto ents = get_now_selected_list();
-    auto ent = (_id < 0 && !ents.isEmpty()) ? ents.first() : NekoGui::profileManager->GetProfile(_id);
+    auto ent = (_id < 0 && !ents.isEmpty()) ? ents.first() : Vload::profileManager->GetProfile(_id);
     if (ent == nullptr) return;
 
     if (select_mode) {
@@ -298,7 +298,7 @@ void MainWindow::neko_start(int _id) {
         return;
     }
 
-    auto group = NekoGui::profileManager->GetGroup(ent->gid);
+    auto group = Vload::profileManager->GetGroup(ent->gid);
     if (group == nullptr || group->archive) return;
 
     auto result = BuildConfig(ent, false, false);
@@ -307,12 +307,12 @@ void MainWindow::neko_start(int _id) {
         return;
     }
 
-    auto neko_start_stage2 = [=] {
+    auto vload_start_stage2 = [=] {
 #ifndef NKR_NO_GRPC
         libcore::LoadConfigReq req;
         req.set_core_config(QJsonObject2QString(result->coreConfig, false).toStdString());
-        req.set_enable_nekoray_connections(NekoGui::dataStore->connection_statistics);
-        if (NekoGui::dataStore->traffic_loop_interval > 0) {
+        req.set_enable_vload_connections(Vload::dataStore->connection_statistics);
+        if (Vload::dataStore->traffic_loop_interval > 0) {
             req.add_stats_outbounds("proxy");
             req.add_stats_outbounds("bypass");
         }
@@ -326,20 +326,20 @@ void MainWindow::neko_start(int _id) {
             return false;
         }
         //
-        NekoGui_traffic::trafficLooper->proxy = result->outboundStat.get();
-        NekoGui_traffic::trafficLooper->items = result->outboundStats;
-        NekoGui::dataStore->ignoreConnTag = result->ignoreConnTag;
-        NekoGui_traffic::trafficLooper->loop_enabled = true;
+        Vload_traffic::trafficLooper->proxy = result->outboundStat.get();
+        Vload_traffic::trafficLooper->items = result->outboundStats;
+        Vload::dataStore->ignoreConnTag = result->ignoreConnTag;
+        Vload_traffic::trafficLooper->loop_enabled = true;
 #endif
 
         runOnUiThread(
             [=] {
                 auto extCs = CreateExtCFromExtR(result->extRs, true);
-                NekoGui_sys::running_ext.splice(NekoGui_sys::running_ext.end(), extCs);
+                Vload_sys::running_ext.splice(Vload_sys::running_ext.end(), extCs);
             },
             DS_cores);
 
-        NekoGui::dataStore->UpdateStartedId(ent->id);
+        Vload::dataStore->UpdateStartedId(ent->id);
         running = ent;
 
         runOnUiThread([=] {
@@ -362,7 +362,7 @@ void MainWindow::neko_start(int _id) {
     mu_stopping.unlock();
 
     // check core state
-    if (!NekoGui::dataStore->core_running) {
+    if (!Vload::dataStore->core_running) {
         runOnUiThread(
             [=] {
                 MW_show_log("Try to start the config, but the core has not listened to the grpc port, so restart it...");
@@ -371,7 +371,7 @@ void MainWindow::neko_start(int _id) {
             },
             DS_cores);
         mu_starting.unlock();
-        return; // let CoreProcess call neko_start when core is up
+        return; // let CoreProcess call vload_start when core is up
     }
 
     // timeout message
@@ -382,13 +382,13 @@ void MainWindow::neko_start(int _id) {
 
     runOnNewThread([=] {
         // stop current running
-        if (NekoGui::dataStore->started_id >= 0) {
-            runOnUiThread([=] { neko_stop(false, true); });
+        if (Vload::dataStore->started_id >= 0) {
+            runOnUiThread([=] { vload_stop(false, true); });
             sem_stopped.acquire();
         }
         // do start
         MW_show_log(">>>>>>>> " + tr("Starting profile %1").arg(ent->bean->DisplayTypeAndName()));
-        if (!neko_start_stage2()) {
+        if (!vload_start_stage2()) {
             MW_show_log("<<<<<<<< " + tr("Failed to start profile %1").arg(ent->bean->DisplayTypeAndName()));
         }
         mu_starting.unlock();
@@ -399,7 +399,7 @@ void MainWindow::neko_start(int _id) {
             restartMsgbox->deleteLater();
 #ifdef Q_OS_LINUX
             // Check systemd-resolved
-            if (NekoGui::dataStore->spmode_vpn && NekoGui::dataStore->routing->direct_dns.startsWith("local") && ReadFileText("/etc/resolv.conf").contains("systemd-resolved")) {
+            if (Vload::dataStore->spmode_vpn && Vload::dataStore->routing->direct_dns.startsWith("local") && ReadFileText("/etc/resolv.conf").contains("systemd-resolved")) {
                 MW_show_log("[Warning] The default Direct DNS may not works with systemd-resolved, you may consider change your DNS settings.");
             }
 #endif
@@ -407,35 +407,35 @@ void MainWindow::neko_start(int _id) {
     });
 }
 
-void MainWindow::neko_stop(bool crash, bool sem) {
-    auto id = NekoGui::dataStore->started_id;
+void MainWindow::vload_stop(bool crash, bool sem) {
+    auto id = Vload::dataStore->started_id;
     if (id < 0) {
         if (sem) sem_stopped.release();
         return;
     }
 
-    auto neko_stop_stage2 = [=] {
+    auto vload_stop_stage2 = [=] {
         runOnUiThread(
             [=] {
-                while (!NekoGui_sys::running_ext.empty()) {
-                    auto extC = NekoGui_sys::running_ext.front();
+                while (!Vload_sys::running_ext.empty()) {
+                    auto extC = Vload_sys::running_ext.front();
                     extC->Kill();
-                    NekoGui_sys::running_ext.pop_front();
+                    Vload_sys::running_ext.pop_front();
                 }
             },
             DS_cores);
 
 #ifndef NKR_NO_GRPC
-        NekoGui_traffic::trafficLooper->loop_enabled = false;
-        NekoGui_traffic::trafficLooper->loop_mutex.lock();
-        if (NekoGui::dataStore->traffic_loop_interval != 0) {
-            NekoGui_traffic::trafficLooper->UpdateAll();
-            for (const auto &item: NekoGui_traffic::trafficLooper->items) {
-                NekoGui::profileManager->GetProfile(item->id)->Save();
+        Vload_traffic::trafficLooper->loop_enabled = false;
+        Vload_traffic::trafficLooper->loop_mutex.lock();
+        if (Vload::dataStore->traffic_loop_interval != 0) {
+            Vload_traffic::trafficLooper->UpdateAll();
+            for (const auto &item: Vload_traffic::trafficLooper->items) {
+                Vload::profileManager->GetProfile(item->id)->Save();
                 runOnUiThread([=] { refresh_proxy_list(item->id); });
             }
         }
-        NekoGui_traffic::trafficLooper->loop_mutex.unlock();
+        Vload_traffic::trafficLooper->loop_mutex.unlock();
 
         if (!crash) {
             bool rpcOK;
@@ -449,8 +449,8 @@ void MainWindow::neko_stop(bool crash, bool sem) {
         }
 #endif
 
-        NekoGui::dataStore->UpdateStartedId(-1919);
-        NekoGui::dataStore->need_keep_vpn_off = false;
+        Vload::dataStore->UpdateStartedId(-1919);
+        Vload::dataStore->need_keep_vpn_off = false;
         running = nullptr;
 
         runOnUiThread([=] {
@@ -475,7 +475,7 @@ void MainWindow::neko_stop(bool crash, bool sem) {
     runOnNewThread([=] {
         // do stop
         MW_show_log(">>>>>>>> " + tr("Stopping profile %1").arg(running->bean->DisplayTypeAndName()));
-        if (!neko_stop_stage2()) {
+        if (!vload_stop_stage2()) {
             MW_show_log("<<<<<<<< " + tr("Failed to stop, please restart the program."));
         }
         mu_stopping.unlock();
@@ -490,7 +490,7 @@ void MainWindow::neko_stop(bool crash, bool sem) {
 }
 
 // vload: poll the two adapters a running load-balance profile is pinned to
-// and tell nekobox_core when one goes up/down, so the "weighted" outbound
+// and tell vload_core when one goes up/down, so the "weighted" outbound
 // group can fail traffic over to the surviving network. Called from the
 // existing 2s status-refresh timer in MainWindow's constructor - only does
 // anything while a "loadbalance" profile is the one actually running.
@@ -512,13 +512,13 @@ void MainWindow::CheckLoadBalanceNetworkAvailability() {
     static int lastA = -1;
     static int lastB = -1;
 
-    if (!NekoGui::dataStore->core_running || NekoGui::dataStore->started_id < 0) {
+    if (!Vload::dataStore->core_running || Vload::dataStore->started_id < 0) {
         lastProfileId = -1;
         wasRunning = false;
         return;
     }
 
-    auto ent = NekoGui::profileManager->GetProfile(NekoGui::dataStore->started_id);
+    auto ent = Vload::profileManager->GetProfile(Vload::dataStore->started_id);
     if (ent == nullptr || ent->type != "loadbalance") {
         lastProfileId = -1;
         wasRunning = false;
@@ -567,8 +567,8 @@ void MainWindow::CheckUpdate() {
     bool ok;
     libcore::UpdateReq request;
     request.set_action(libcore::UpdateAction::Check);
-    request.set_check_pre_release(NekoGui::dataStore->check_include_pre);
-    auto response = NekoGui_rpc::defaultClient->Update(&ok, request);
+    request.set_check_pre_release(Vload::dataStore->check_include_pre);
+    auto response = Vload_rpc::defaultClient->Update(&ok, request);
     if (!ok) return;
 
     auto err = response.error();
@@ -587,7 +587,7 @@ void MainWindow::CheckUpdate() {
     }
 
     runOnUiThread([=] {
-        auto allow_updater = !NekoGui::dataStore->flag_use_appdata;
+        auto allow_updater = !Vload::dataStore->flag_use_appdata;
         auto note_pre_release = response.is_pre_release() ? " (Pre-release)" : "";
         QMessageBox box(QMessageBox::Question, QObject::tr("Update") + note_pre_release,
                         QObject::tr("Update found: %1\nRelease note:\n%2").arg(response.assets_name().c_str(), response.release_note().c_str()));
@@ -606,7 +606,7 @@ void MainWindow::CheckUpdate() {
                 bool ok2;
                 libcore::UpdateReq request2;
                 request2.set_action(libcore::UpdateAction::Download);
-                auto response2 = NekoGui_rpc::defaultClient->Update(&ok2, request2);
+                auto response2 = Vload_rpc::defaultClient->Update(&ok2, request2);
                 runOnUiThread([=] {
                     if (response2.error().empty()) {
                         auto q = QMessageBox::question(nullptr, QObject::tr("Update"),

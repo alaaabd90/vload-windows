@@ -3,9 +3,9 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-#include "main/NekoGui.hpp"
+#include "main/Vload.hpp"
 
-namespace NekoGui_fmt {
+namespace Vload_fmt {
     struct CoreObjOutboundBuildResult {
     public:
         QJsonObject outbound;
@@ -39,7 +39,7 @@ namespace NekoGui_fmt {
 
         //
 
-        QString ToNekorayShareLink(const QString &type);
+        QString ToVloadShareLink(const QString &type);
 
         void ResolveDomainToIP(const std::function<void()> &onFinished);
 
@@ -66,4 +66,4 @@ namespace NekoGui_fmt {
         virtual QString ToShareLink() { return {}; };
     };
 
-} // namespace NekoGui_fmt
+} // namespace Vload_fmt

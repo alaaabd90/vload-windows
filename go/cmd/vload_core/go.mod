@@ -1,4 +1,4 @@
-module nekobox_core
+module vload_core
 
 go 1.25.0
 

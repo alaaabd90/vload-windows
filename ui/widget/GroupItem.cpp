@@ -41,7 +41,7 @@ QString ParseSubInfo(const QString &info) {
     return result;
 }
 
-GroupItem::GroupItem(QWidget *parent, const std::shared_ptr<NekoGui::Group> &ent, QListWidgetItem *item) : QWidget(parent), ui(new Ui::GroupItem) {
+GroupItem::GroupItem(QWidget *parent, const std::shared_ptr<Vload::Group> &ent, QListWidgetItem *item) : QWidget(parent), ui(new Ui::GroupItem) {
     ui->setupUi(this);
     this->setLayoutDirection(Qt::LeftToRight);
 
@@ -51,7 +51,7 @@ GroupItem::GroupItem(QWidget *parent, const std::shared_ptr<NekoGui::Group> &ent
     if (ent == nullptr) return;
 
     connect(this, &GroupItem::edit_clicked, this, &GroupItem::on_edit_clicked);
-    connect(NekoGui_sub::groupUpdater, &NekoGui_sub::GroupUpdater::asyncUpdateCallback, this, [=](int gid) { if (gid == this->ent->id) refresh_data(); });
+    connect(Vload_sub::groupUpdater, &Vload_sub::GroupUpdater::asyncUpdateCallback, this, [=](int gid) { if (gid == this->ent->id) refresh_data(); });
 
     refresh_data();
 }
@@ -99,7 +99,7 @@ void GroupItem::refresh_data() {
 }
 
 void GroupItem::on_update_sub_clicked() {
-    NekoGui_sub::groupUpdater->AsyncUpdate(ent->url, ent->id);
+    Vload_sub::groupUpdater->AsyncUpdate(ent->url, ent->id);
 }
 
 void GroupItem::on_edit_clicked() {
@@ -116,10 +116,10 @@ void GroupItem::on_edit_clicked() {
 }
 
 void GroupItem::on_remove_clicked() {
-    if (NekoGui::profileManager->groups.size() <= 1) return;
+    if (Vload::profileManager->groups.size() <= 1) return;
     if (QMessageBox::question(this, tr("Confirmation"), tr("Remove %1?").arg(ent->name)) ==
         QMessageBox::StandardButton::Yes) {
-        NekoGui::profileManager->DeleteGroup(ent->id);
+        Vload::profileManager->DeleteGroup(ent->id);
         MW_dialog_message(Dialog_DialogManageGroups, "refresh-1");
         delete item;
     }

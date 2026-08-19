@@ -1,8 +1,8 @@
 #pragma once
 
-#include "main/NekoGui.hpp"
+#include "main/Vload.hpp"
 
-namespace NekoGui_fmt {
+namespace Vload_fmt {
     // A vload load-balance profile: references two other existing profiles by
     // id (slot A / slot B), each pinned to a Windows network adapter with a
     // relative speed weight. Modeled on ChainBean - a profile whose bean just
@@ -35,4 +35,4 @@ namespace NekoGui_fmt {
 
         QString DisplayAddress() override { return ""; };
     };
-} // namespace NekoGui_fmt
+} // namespace Vload_fmt

@@ -2,7 +2,7 @@
 
 #include "fmt/AbstractBean.hpp"
 
-namespace NekoGui_fmt {
+namespace Vload_fmt {
     class SSHBean : public AbstractBean {
     public:
         QString user = "root";
@@ -25,4 +25,4 @@ namespace NekoGui_fmt {
 
         CoreObjOutboundBuildResult BuildCoreObjSingBox() override;
     };
-} // namespace NekoGui_fmt
+} // namespace Vload_fmt

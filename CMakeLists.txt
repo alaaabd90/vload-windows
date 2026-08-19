@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(nekobox VERSION 1.2.0 LANGUAGES CXX)
+project(vload VERSION 1.2.0 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -123,8 +123,8 @@ set(PROJECT_SOURCES
         ${PLATFORM_SOURCES}
 
         main/main.cpp
-        main/NekoGui.cpp
-        main/NekoGui_Utils.cpp
+        main/Vload.cpp
+        main/Vload_Utils.cpp
         main/HTTPRequestHelper.cpp
 
         3rdparty/base64.cpp
@@ -294,29 +294,29 @@ set(PROJECT_SOURCES
         ui/material/NavDrawer.hpp
         main/MaterialPalette.hpp
 
-        res/neko.qrc
+        res/vload.qrc
         ${QV2RAY_RC}
 )
 
 # Qt exe
 if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(nekobox
+    qt_add_executable(vload
             MANUAL_FINALIZATION
             ${PROJECT_SOURCES}
     )
     # Define target properties for Android with Qt 6 as:
-    #    set_property(TARGET nekobox APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+    #    set_property(TARGET vload APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
     #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
     # For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else ()
     if (ANDROID)
-        add_library(nekobox SHARED
+        add_library(vload SHARED
                 ${PROJECT_SOURCES}
         )
         # Define properties for Android with Qt 5 after find_package() calls as:
         #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else ()
-        add_executable(nekobox
+        add_executable(vload
                 ${PROJECT_SOURCES}
         )
     endif ()
@@ -324,11 +324,11 @@ endif ()
 
 # Target
 
-set_property(TARGET nekobox PROPERTY AUTOUIC ON)
-set_property(TARGET nekobox PROPERTY AUTOMOC ON)
-set_property(TARGET nekobox PROPERTY AUTORCC ON)
+set_property(TARGET vload PROPERTY AUTOUIC ON)
+set_property(TARGET vload PROPERTY AUTOMOC ON)
+set_property(TARGET vload PROPERTY AUTORCC ON)
 
-set_target_properties(nekobox PROPERTIES
+set_target_properties(vload PROPERTIES
         WIN32_EXECUTABLE TRUE
 )
 
@@ -343,17 +343,17 @@ set(LUPDATE_OPTIONS
         -locations none -no-obsolete
 )
 if (${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_lupdate(nekobox TS_FILES ${TS_FILES} OPTIONS ${LUPDATE_OPTIONS})
-    qt_add_lrelease(nekobox TS_FILES ${TS_FILES} QM_FILES_OUTPUT_VARIABLE QM_FILES)
+    qt_add_lupdate(vload TS_FILES ${TS_FILES} OPTIONS ${LUPDATE_OPTIONS})
+    qt_add_lrelease(vload TS_FILES ${TS_FILES} QM_FILES_OUTPUT_VARIABLE QM_FILES)
 else ()
     qt5_create_translation(QM_FILES ${PROJECT_SOURCES} ${TS_FILES} OPTIONS ${LUPDATE_OPTIONS})
 endif ()
 configure_file(translations/translations.qrc ${CMAKE_BINARY_DIR} COPYONLY)
-target_sources(nekobox PRIVATE ${CMAKE_BINARY_DIR}/translations.qrc)
+target_sources(vload PRIVATE ${CMAKE_BINARY_DIR}/translations.qrc)
 
 # Target Link
 
-target_link_libraries(nekobox PRIVATE
+target_link_libraries(vload PRIVATE
         Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Svg
         Threads::Threads
         ${NKR_EXTERNAL_TARGETS}
@@ -361,5 +361,5 @@ target_link_libraries(nekobox PRIVATE
 )
 
 if (QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(nekobox)
+    qt_finalize_executable(vload)
 endif ()

@@ -41,8 +41,8 @@ void ThemeManager::ApplyTheme(const QString &themeName, bool dark) {
     qss.replace("%DIVIDER%", divider);
     qss.replace("%TEXT_ON_ACCENT%", textOnAccent);
 
-    auto nekoray_css = ReadFileText(":/neko/neko.css");
-    qApp->setStyleSheet(qss + "\n" + nekoray_css);
+    auto vload_css = ReadFileText(":/vload/vload.css");
+    qApp->setStyleSheet(qss + "\n" + vload_css);
 
     current_theme = themeName;
     current_dark = dark;

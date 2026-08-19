@@ -1,5 +1,5 @@
-#ifndef NEKORAY_DIALOG_VPN_SETTINGS_H
-#define NEKORAY_DIALOG_VPN_SETTINGS_H
+#ifndef VLOAD_DIALOG_VPN_SETTINGS_H
+#define VLOAD_DIALOG_VPN_SETTINGS_H
 
 #include <QDialog>
 
@@ -27,4 +27,4 @@ public slots:
     void on_troubleshooting_clicked();
 };
 
-#endif // NEKORAY_DIALOG_VPN_SETTINGS_H
+#endif // VLOAD_DIALOG_VPN_SETTINGS_H

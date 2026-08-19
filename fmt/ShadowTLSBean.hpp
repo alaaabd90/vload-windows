@@ -2,7 +2,7 @@
 
 #include "fmt/AbstractBean.hpp"
 
-namespace NekoGui_fmt {
+namespace Vload_fmt {
     class ShadowTLSBean : public AbstractBean {
     public:
         int version = 3;
@@ -29,4 +29,4 @@ namespace NekoGui_fmt {
 
         CoreObjOutboundBuildResult BuildCoreObjSingBox() override;
     };
-} // namespace NekoGui_fmt
+} // namespace Vload_fmt

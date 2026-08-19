@@ -13,7 +13,7 @@ EditShadowTLS::~EditShadowTLS() {
     delete ui;
 }
 
-void EditShadowTLS::onStart(std::shared_ptr<NekoGui::ProxyEntity> _ent) {
+void EditShadowTLS::onStart(std::shared_ptr<Vload::ProxyEntity> _ent) {
     this->ent = _ent;
     auto bean = this->ent->ShadowTLSBean();
 

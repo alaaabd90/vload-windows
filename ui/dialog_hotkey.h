@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QDialog>
-#include "main/NekoGui.hpp"
+#include "main/Vload.hpp"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

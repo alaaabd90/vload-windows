@@ -16,17 +16,17 @@ func Updater() {
 		if runtime.GOOS == "linux" {
 			os.RemoveAll("./usr")
 		}
-		os.RemoveAll("./nekoray_update")
+		os.RemoveAll("./vload_update")
 	}
 
 	// find update package
 	var updatePackagePath string
 	if len(os.Args) == 2 && Exist(os.Args[1]) {
 		updatePackagePath = os.Args[1]
-	} else if Exist("./nekoray.zip") {
-		updatePackagePath = "./nekoray.zip"
-	} else if Exist("./nekoray.tar.gz") {
-		updatePackagePath = "./nekoray.tar.gz"
+	} else if Exist("./vload.zip") {
+		updatePackagePath = "./vload.zip"
+	} else if Exist("./vload.tar.gz") {
+		updatePackagePath = "./vload.tar.gz"
 	} else {
 		log.Fatalln("no update")
 	}
@@ -39,7 +39,7 @@ func Updater() {
 		if err != nil {
 			log.Fatalln(err.Error())
 		}
-		err = extract.Zip(context.Background(), f, "./nekoray_update", nil)
+		err = extract.Zip(context.Background(), f, "./vload_update", nil)
 		if err != nil {
 			log.Fatalln(err.Error())
 		}
@@ -50,7 +50,7 @@ func Updater() {
 		if err != nil {
 			log.Fatalln(err.Error())
 		}
-		err = extract.Gz(context.Background(), f, "./nekoray_update", nil)
+		err = extract.Gz(context.Background(), f, "./vload_update", nil)
 		if err != nil {
 			log.Fatalln(err.Error())
 		}
@@ -62,20 +62,20 @@ func Updater() {
 	removeAll("./*.dmp")
 
 	// update move
-	err := Mv("./nekoray_update/nekoray", "./")
+	err := Mv("./vload_update/vload", "./")
 	if err != nil {
 		MessageBoxPlain("vload Updater", "Update failed. Please close the running instance and run the updater again.\n\n"+err.Error())
 		log.Fatalln(err.Error())
 	}
 
-	os.RemoveAll("./nekoray_update")
-	os.RemoveAll("./nekoray.zip")
-	os.RemoveAll("./nekoray.tar.gz")
+	os.RemoveAll("./vload_update")
+	os.RemoveAll("./vload.zip")
+	os.RemoveAll("./vload.tar.gz")
 
-	// nekoray -> nekobox
-	os.Remove("./nekoray.exe")
-	os.Remove("./nekoray.png")
-	os.Remove("./nekoray_core.exe")
+	// vload -> vload
+	os.Remove("./vload.exe")
+	os.Remove("./vload.png")
+	os.Remove("./vload_core.exe")
 }
 
 func Exist(path string) bool {

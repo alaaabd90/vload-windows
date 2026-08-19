@@ -13,7 +13,7 @@ EditWireGuard::~EditWireGuard() {
     delete ui;
 }
 
-void EditWireGuard::onStart(std::shared_ptr<NekoGui::ProxyEntity> _ent) {
+void EditWireGuard::onStart(std::shared_ptr<Vload::ProxyEntity> _ent) {
     this->ent = _ent;
     auto bean = this->ent->WireGuardBean();
 

@@ -2,7 +2,7 @@
 
 #include <QMainWindow>
 
-#include "main/NekoGui.hpp"
+#include "main/Vload.hpp"
 
 #ifndef MW_INTERFACE
 
@@ -25,7 +25,7 @@
 
 #endif
 
-namespace NekoGui_sys {
+namespace Vload_sys {
     class CoreProcess;
 }
 
@@ -51,15 +51,15 @@ public:
 
     void refresh_status(const QString &traffic_update = "");
 
-    void neko_start(int _id = -1);
+    void vload_start(int _id = -1);
 
-    void neko_stop(bool crash = false, bool sem = false);
+    void vload_stop(bool crash = false, bool sem = false);
 
     void CheckLoadBalanceNetworkAvailability();
 
-    void neko_set_spmode_system_proxy(bool enable, bool save = true);
+    void vload_set_spmode_system_proxy(bool enable, bool save = true);
 
-    void neko_set_spmode_vpn(bool enable, bool save = true);
+    void vload_set_spmode_vpn(bool enable, bool save = true);
 
     void show_log_impl(const QString &log);
 
@@ -149,7 +149,7 @@ private:
     QShortcut *shortcut_ctrl_f = new QShortcut(QKeySequence("Ctrl+F"), this);
     QShortcut *shortcut_esc = new QShortcut(QKeySequence("Esc"), this);
     //
-    NekoGui_sys::CoreProcess *core_process;
+    Vload_sys::CoreProcess *core_process;
     qint64 vpn_pid = 0;
     //
     bool qvLogAutoScoll = true;
@@ -157,7 +157,7 @@ private:
     //
     QString title_error;
     int icon_status = -1;
-    std::shared_ptr<NekoGui::ProxyEntity> running;
+    std::shared_ptr<Vload::ProxyEntity> running;
     QString traffic_update_cache;
     QTime last_test_time;
     //
@@ -173,9 +173,9 @@ private:
     class ConnectFab *connectFab = nullptr;
     class StatsBar *statsBar = nullptr;
 
-    QList<std::shared_ptr<NekoGui::ProxyEntity>> get_now_selected_list();
+    QList<std::shared_ptr<Vload::ProxyEntity>> get_now_selected_list();
 
-    QList<std::shared_ptr<NekoGui::ProxyEntity>> get_selected_or_group();
+    QList<std::shared_ptr<Vload::ProxyEntity>> get_selected_or_group();
 
     void dialog_message_impl(const QString &sender, const QString &info);
 

@@ -20,11 +20,11 @@ DialogBackup::~DialogBackup() {
 
 void DialogBackup::on_export_button_clicked() {
     QJsonArray profilesArr;
-    for (const auto &[id, profile]: NekoGui::profileManager->profiles) {
+    for (const auto &[id, profile]: Vload::profileManager->profiles) {
         profilesArr += profile->ToJson();
     }
     QJsonArray groupsArr;
-    for (const auto &[id, group]: NekoGui::profileManager->groups) {
+    for (const auto &[id, group]: Vload::profileManager->groups) {
         groupsArr += group->ToJson();
     }
 
@@ -32,7 +32,7 @@ void DialogBackup::on_export_button_clicked() {
         {"version", 1},
         {"profiles", profilesArr},
         {"groups", groupsArr},
-        {"settings", NekoGui::dataStore->ToJson()},
+        {"settings", Vload::dataStore->ToJson()},
     };
 
     auto fn = QFileDialog::getSaveFileName(this, tr("Export Backup"), "vload-backup.json", "*.json");
@@ -84,12 +84,12 @@ void DialogBackup::on_import_button_clicked() {
     QMap<int, int> gidOld2New;
     for (const auto &gv: groupsArr) {
         auto gobj = gv.toObject();
-        auto group = NekoGui::ProfileManager::NewGroup();
+        auto group = Vload::ProfileManager::NewGroup();
         group->FromJson(gobj);
         auto oldId = group->id;
         group->id = -1;
         group->order.clear(); // rebuilt below from the newly re-id'd profiles
-        NekoGui::profileManager->AddGroup(group);
+        Vload::profileManager->AddGroup(group);
         gidOld2New[oldId] = group->id;
     }
 
@@ -97,13 +97,13 @@ void DialogBackup::on_import_button_clicked() {
     int importedProfiles = 0;
     for (const auto &pv: profilesArr) {
         auto pobj = pv.toObject();
-        auto ent = NekoGui::ProfileManager::NewProxyEntity(pobj["type"].toString());
+        auto ent = Vload::ProfileManager::NewProxyEntity(pobj["type"].toString());
         if (ent->bean->version == -114514) continue; // unknown type, skip
         ent->FromJson(pobj);
         auto oldGid = ent->gid;
         ent->id = -1;
         ent->gid = gidOld2New.value(oldGid, 0); // fall back to Default group if its group wasn't in this backup
-        NekoGui::profileManager->AddProfile(ent, ent->gid);
+        Vload::profileManager->AddProfile(ent, ent->gid);
         newGroupOrder[ent->gid] += ent->id;
         importedProfiles++;
     }
@@ -112,15 +112,15 @@ void DialogBackup::on_import_button_clicked() {
     // profile ids, which no longer exist post-import - rebuild them from the
     // newly-allocated ids instead.
     for (auto it = gidOld2New.constBegin(); it != gidOld2New.constEnd(); ++it) {
-        auto group = NekoGui::profileManager->GetGroup(it.value());
+        auto group = Vload::profileManager->GetGroup(it.value());
         if (group == nullptr) continue;
         group->order = newGroupOrder.value(it.value());
         group->Save();
     }
 
     if (hasSettings) {
-        NekoGui::dataStore->FromJson(root["settings"].toObject());
-        NekoGui::dataStore->Save();
+        Vload::dataStore->FromJson(root["settings"].toObject());
+        Vload::dataStore->Save();
     }
 
     QMessageBox::information(this, tr("Import Backup"),

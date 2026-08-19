@@ -1,7 +1,7 @@
 #include "dialog_about.h"
 #include "ui_dialog_about.h"
 
-#include "main/NekoGui_Utils.hpp"
+#include "main/Vload_Utils.hpp"
 
 #include <QFile>
 #include <QDesktopServices>
@@ -14,7 +14,7 @@ DialogAbout::DialogAbout(QWidget *parent) : QDialog(parent), ui(new Ui::DialogAb
     ui->app_name->setText(software_name + " " + NKR_VERSION);
     ui->app_description->setText(tr("A cross-platform sing-box GUI client."));
 
-    QFile licenseFile(":/neko/LICENSE");
+    QFile licenseFile(":/vload/LICENSE");
     if (licenseFile.open(QIODevice::ReadOnly)) {
         ui->license_text->setPlainText(QString::fromUtf8(licenseFile.readAll()));
         licenseFile.close();

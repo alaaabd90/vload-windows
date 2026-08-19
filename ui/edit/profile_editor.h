@@ -7,7 +7,7 @@
 
 class ProfileEditor {
 public:
-    virtual void onStart(std::shared_ptr<NekoGui::ProxyEntity> ent) = 0;
+    virtual void onStart(std::shared_ptr<Vload::ProxyEntity> ent) = 0;
 
     virtual bool onEnd() = 0;
 

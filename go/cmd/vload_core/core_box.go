@@ -15,7 +15,7 @@ var instance *box.Box
 var instance_cancel context.CancelFunc
 
 func setupCore() {
-	neko_log.SetupLog(50*1024, "./neko.log")
+	neko_log.SetupLog(50*1024, "./vload.log")
 	//
 	neko_common.GetCurrentInstance = func() interface{} {
 		return instance

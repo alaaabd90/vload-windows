@@ -6,28 +6,28 @@
 #include <QMetaEnum>
 #include <QTimer>
 
-#include "main/NekoGui.hpp"
+#include "main/Vload.hpp"
 
-namespace NekoGui_network {
+namespace Vload_network {
 
-    NekoHTTPResponse NetworkRequestHelper::HttpGet(const QUrl &url) {
+    VloadHTTPResponse NetworkRequestHelper::HttpGet(const QUrl &url) {
         QNetworkRequest request;
         QNetworkAccessManager accessManager;
         request.setUrl(url);
         // Set proxy
-        if (NekoGui::dataStore->sub_use_proxy) {
+        if (Vload::dataStore->sub_use_proxy) {
             QNetworkProxy p;
             // Note: sing-box mixed socks5 protocol error
             p.setType(QNetworkProxy::HttpProxy);
             p.setHostName("127.0.0.1");
-            p.setPort(NekoGui::dataStore->inbound_socks_port);
-            if (NekoGui::dataStore->inbound_auth->NeedAuth()) {
-                p.setUser(NekoGui::dataStore->inbound_auth->username);
-                p.setPassword(NekoGui::dataStore->inbound_auth->password);
+            p.setPort(Vload::dataStore->inbound_socks_port);
+            if (Vload::dataStore->inbound_auth->NeedAuth()) {
+                p.setUser(Vload::dataStore->inbound_auth->username);
+                p.setPassword(Vload::dataStore->inbound_auth->password);
             }
             accessManager.setProxy(p);
-            if (NekoGui::dataStore->started_id < 0) {
-                return NekoHTTPResponse{QObject::tr("Request with proxy but no profile started.")};
+            if (Vload::dataStore->started_id < 0) {
+                return VloadHTTPResponse{QObject::tr("Request with proxy but no profile started.")};
             }
         }
         if (accessManager.proxy().type() == QNetworkProxy::Socks5Proxy) {
@@ -38,8 +38,8 @@ namespace NekoGui_network {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 9, 0))
         request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
 #endif
-        request.setHeader(QNetworkRequest::KnownHeaders::UserAgentHeader, NekoGui::dataStore->GetUserAgent());
-        if (NekoGui::dataStore->sub_insecure) {
+        request.setHeader(QNetworkRequest::KnownHeaders::UserAgentHeader, Vload::dataStore->GetUserAgent());
+        if (Vload::dataStore->sub_insecure) {
             QSslConfiguration c;
             c.setPeerVerifyMode(QSslSocket::PeerVerifyMode::VerifyNone);
             request.setSslConfiguration(c);
@@ -51,7 +51,7 @@ namespace NekoGui_network {
             for (const auto &err: errors) {
                 error_str << err.errorString();
             }
-            MW_show_log(QStringLiteral("SSL Errors: %1 %2").arg(error_str.join(","), NekoGui::dataStore->sub_insecure ? "(Ignored)" : ""));
+            MW_show_log(QStringLiteral("SSL Errors: %1 %2").arg(error_str.join(","), Vload::dataStore->sub_insecure ? "(Ignored)" : ""));
         });
         // Wait for response
         auto abortTimer = new QTimer;
@@ -69,7 +69,7 @@ namespace NekoGui_network {
             abortTimer->deleteLater();
         }
         //
-        auto result = NekoHTTPResponse{_reply->error() == QNetworkReply::NetworkError::NoError ? "" : _reply->errorString(),
+        auto result = VloadHTTPResponse{_reply->error() == QNetworkReply::NetworkError::NoError ? "" : _reply->errorString(),
                                        _reply->readAll(), _reply->rawHeaderPairs()};
         _reply->deleteLater();
         return result;
@@ -82,4 +82,4 @@ namespace NekoGui_network {
         return "";
     }
 
-} // namespace NekoGui_network
+} // namespace Vload_network

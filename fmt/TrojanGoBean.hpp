@@ -2,7 +2,7 @@
 
 #include "fmt/AbstractBean.hpp"
 
-namespace NekoGui_fmt {
+namespace Vload_fmt {
     // Trojan-Go has no native sing-box outbound - Android's own implementation
     // (fmt/trojan_go/TrojanGoBean.java) doesn't reimplement its wire protocol
     // either, it shells out to an external "trojan-go" plugin binary and routes
@@ -38,4 +38,4 @@ namespace NekoGui_fmt {
 
         ExternalBuildResult BuildExternal(int mapping_port, int socks_port, int external_stat) override;
     };
-} // namespace NekoGui_fmt
+} // namespace Vload_fmt

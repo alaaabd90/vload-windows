@@ -17,13 +17,13 @@ public:
 
     ~EditLoadBalance() override;
 
-    void onStart(std::shared_ptr<NekoGui::ProxyEntity> _ent) override;
+    void onStart(std::shared_ptr<Vload::ProxyEntity> _ent) override;
 
     bool onEnd() override;
 
 private:
     Ui::EditLoadBalance *ui;
-    std::shared_ptr<NekoGui::ProxyEntity> ent;
+    std::shared_ptr<Vload::ProxyEntity> ent;
 
     int slotAProfileId = -1;
     int slotBProfileId = -1;

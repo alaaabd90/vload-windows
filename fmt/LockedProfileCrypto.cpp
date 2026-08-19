@@ -10,7 +10,7 @@
 
 #pragma comment(lib, "bcrypt.lib")
 
-namespace NekoGui_fmt {
+namespace Vload_fmt {
     namespace {
         constexpr int GCM_TAG_BYTES = 16;
         constexpr int GCM_IV_BYTES = 12;
@@ -137,7 +137,7 @@ namespace NekoGui_fmt {
 
         return {LockedProfileResultType::Decrypted, QString::fromUtf8(plainBytes), {}, {}};
     }
-} // namespace NekoGui_fmt
+} // namespace Vload_fmt
 
 #else
 
@@ -145,7 +145,7 @@ namespace NekoGui_fmt {
 // backs the AES-256-GCM impl above) - not yet ported to Linux/macOS.
 // Stubbed here so non-Windows builds still link instead of failing on
 // windows.h; callers see NotLocked/empty output rather than a crash.
-namespace NekoGui_fmt {
+namespace Vload_fmt {
     QByteArray LockedProfileCrypto_EncryptForHwid(const QString &, const QString &) {
         return {};
     }
@@ -153,6 +153,6 @@ namespace NekoGui_fmt {
     LockedProfileDecryptResult LockedProfileCrypto_TryDecrypt(const QByteArray &, const QString &) {
         return {LockedProfileResultType::NotLocked, {}, {}, {}};
     }
-} // namespace NekoGui_fmt
+} // namespace Vload_fmt
 
 #endif

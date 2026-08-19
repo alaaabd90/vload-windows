@@ -2,7 +2,7 @@
 set -e
 
 source libs/env_deploy.sh
-ENV_NEKORAY=1
+ENV_VLOAD=1
 source libs/get_source_env.sh
 pushd ..
 
@@ -29,10 +29,10 @@ popd
 ####
 
 if [ ! -d "libneko" ]; then
-  git clone --no-checkout https://github.com/alaaabd90/libneko-vload.git libneko
+  git clone --no-checkout https://github.com/MatsuriDayo/libneko.git libneko
 fi
 pushd libneko
-git checkout "$COMMIT_LIBNEKO"
+git checkout "$COMMIT_LIBVLOAD"
 
 popd
 

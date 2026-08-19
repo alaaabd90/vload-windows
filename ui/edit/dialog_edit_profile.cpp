@@ -27,7 +27,7 @@
 #include <QInputDialog>
 
 #define ADJUST_SIZE runOnUiThread([=] { adjustSize(); adjustPosition(mainwindow); }, this);
-#define LOAD_TYPE(a) ui->type->addItem(NekoGui::ProfileManager::NewProxyEntity(a)->bean->DisplayType(), a);
+#define LOAD_TYPE(a) ui->type->addItem(Vload::ProfileManager::NewProxyEntity(a)->bean->DisplayType(), a);
 
 DialogEditProfile::DialogEditProfile(const QString &_type, int profileOrGroupId, QWidget *parent)
     : QDialog(parent), ui(new Ui::DialogEditProfile) {
@@ -81,7 +81,7 @@ DialogEditProfile::DialogEditProfile(const QString &_type, int profileOrGroupId,
             ui->ws_early_data_name->setVisible(false);
             ui->ws_early_data_name_l->setVisible(false);
         }
-        // 传输设置 for NekoBox
+        // 传输设置 for Vload
         if (!ui->utlsFingerprint->count()) ui->utlsFingerprint->addItems(Preset::SingBox::UtlsFingerPrint);
         // 传输设置 是否可见
         int networkBoxVisible = 0;
@@ -144,7 +144,7 @@ DialogEditProfile::DialogEditProfile(const QString &_type, int profileOrGroupId,
 
         ui->apply_to_group->hide();
     } else {
-        this->ent = NekoGui::profileManager->GetProfile(profileOrGroupId);
+        this->ent = Vload::profileManager->GetProfile(profileOrGroupId);
         if (this->ent == nullptr) return;
         this->type = ent->type;
         ui->type->setVisible(false);
@@ -240,7 +240,7 @@ void DialogEditProfile::typeSelected(const QString &newType) {
     }
 
     if (newEnt) {
-        this->ent = NekoGui::ProfileManager::NewProxyEntity(type);
+        this->ent = Vload::ProfileManager::NewProxyEntity(type);
         this->ent->gid = groupId;
     }
 
@@ -263,17 +263,21 @@ void DialogEditProfile::typeSelected(const QString &newType) {
         ui->sni->setText(stream->sni);
         ui->alpn->setText(stream->alpn);
         if (newEnt) {
-            ui->utlsFingerprint->setCurrentText(NekoGui::dataStore->utlsFingerprint);
+            ui->utlsFingerprint->setCurrentText(Vload::dataStore->utlsFingerprint);
         } else {
             ui->utlsFingerprint->setCurrentText(stream->utlsFingerprint);
         }
         ui->insecure->setChecked(stream->allow_insecure);
+        ui->tls_fragment->setChecked(stream->tls_fragment);
+        ui->enable_ech->setChecked(stream->enable_ech);
+        ui->ech_config->setText(stream->ech_config);
         ui->header_type->setCurrentText(stream->header_type);
         ui->ws_early_data_name->setText(stream->ws_early_data_name);
         ui->ws_early_data_length->setText(Int2String(stream->ws_early_data_length));
         ui->reality_pbk->setText(stream->reality_pbk);
         ui->reality_sid->setText(stream->reality_sid);
         ui->multiplex->setCurrentIndex(stream->multiplex_status);
+        ui->tcp_fast_open->setChecked(stream->tcp_fast_open);
         CACHE.certificate = stream->certificate;
     } else {
         ui->right_all_w->setVisible(false);
@@ -322,7 +326,7 @@ void DialogEditProfile::typeSelected(const QString &newType) {
     // 星号
     ADD_ASTERISK(this)
 
-    // 设置 for NekoBox
+    // 设置 for Vload
     if (type == "vmess" || type == "vless") {
         ui->packet_encoding->setVisible(true);
         ui->packet_encoding_l->setVisible(true);
@@ -399,12 +403,16 @@ bool DialogEditProfile::onEnd() {
         stream->alpn = ui->alpn->text();
         stream->utlsFingerprint = ui->utlsFingerprint->currentText();
         stream->allow_insecure = ui->insecure->isChecked();
+        stream->tls_fragment = ui->tls_fragment->isChecked();
+        stream->enable_ech = ui->enable_ech->isChecked();
+        stream->ech_config = ui->ech_config->text();
         stream->header_type = ui->header_type->currentText();
         stream->ws_early_data_name = ui->ws_early_data_name->text();
         stream->ws_early_data_length = ui->ws_early_data_length->text().toInt();
         stream->reality_pbk = ui->reality_pbk->text();
         stream->reality_sid = ui->reality_sid->text();
         stream->multiplex_status = ui->multiplex->currentIndex();
+        stream->tcp_fast_open = ui->tcp_fast_open->isChecked();
         stream->certificate = CACHE.certificate;
     }
 
@@ -425,13 +433,13 @@ void DialogEditProfile::accept() {
     QStringList msg = {"accept"};
 
     if (newEnt) {
-        auto ok = NekoGui::profileManager->AddProfile(ent);
+        auto ok = Vload::profileManager->AddProfile(ent);
         if (!ok) {
             MessageBoxWarning("???", "id exists");
         }
     } else {
         auto changed = ent->Save();
-        if (changed && NekoGui::dataStore->started_id == ent->id) msg << "restart";
+        if (changed && Vload::dataStore->started_id == ent->id) msg << "restart";
     }
 
     MW_dialog_message(Dialog_DialogEditProfile, msg.join(","));
@@ -500,7 +508,7 @@ void DialogEditProfile::on_apply_to_group_clicked() {
         apply_to_group_ui[ui->custom_outbound_edit] = new FloatCheckBox(ui->custom_outbound_edit, this);
         ui->apply_to_group->setText(tr("Confirm"));
     } else {
-        auto group = NekoGui::profileManager->GetGroup(ent->gid);
+        auto group = Vload::profileManager->GetGroup(ent->gid);
         if (group == nullptr) {
             MessageBoxWarning("failed", "unknown group");
             return;
@@ -524,7 +532,7 @@ void DialogEditProfile::on_apply_to_group_clicked() {
     }
 }
 
-void DialogEditProfile::do_apply_to_group(const std::shared_ptr<NekoGui::Group> &group, QWidget *key) {
+void DialogEditProfile::do_apply_to_group(const std::shared_ptr<Vload::Group> &group, QWidget *key) {
     auto stream = GetStreamSettings(ent->bean.get());
 
     auto copyStream = [=](void *p) {

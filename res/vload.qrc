@@ -15,9 +15,9 @@
         <file>icon/material/delete.svg</file>
         <file>icon/material/swap-horizontal.svg</file>
     </qresource>
-    <qresource prefix="/neko">
-        <file alias="vload.png">public/nekobox.png</file>
-        <file>neko.css</file>
+    <qresource prefix="/vload">
+        <file alias="vload.png">public/vload.png</file>
+        <file>vload.css</file>
         <file>vpn/vpn-run-root.sh</file>
         <file>vpn/sing-box-vpn.json</file>
         <file>dashboard-notice.html</file>

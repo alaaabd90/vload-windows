@@ -233,12 +233,12 @@ func (x *ErrorResp) GetError() string {
 }
 
 type LoadConfigReq struct {
-	state                    protoimpl.MessageState `protogen:"open.v1"`
-	CoreConfig               string                 `protobuf:"bytes,1,opt,name=core_config,json=coreConfig,proto3" json:"core_config,omitempty"`
-	EnableNekorayConnections bool                   `protobuf:"varint,2,opt,name=enable_nekoray_connections,json=enableNekorayConnections,proto3" json:"enable_nekoray_connections,omitempty"`
-	StatsOutbounds           []string               `protobuf:"bytes,3,rep,name=stats_outbounds,json=statsOutbounds,proto3" json:"stats_outbounds,omitempty"`
-	unknownFields            protoimpl.UnknownFields
-	sizeCache                protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"open.v1"`
+	CoreConfig             string                 `protobuf:"bytes,1,opt,name=core_config,json=coreConfig,proto3" json:"core_config,omitempty"`
+	EnableVloadConnections bool                   `protobuf:"varint,2,opt,name=enable_vload_connections,json=enableVloadConnections,proto3" json:"enable_vload_connections,omitempty"`
+	StatsOutbounds         []string               `protobuf:"bytes,3,rep,name=stats_outbounds,json=statsOutbounds,proto3" json:"stats_outbounds,omitempty"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *LoadConfigReq) Reset() {
@@ -278,9 +278,9 @@ func (x *LoadConfigReq) GetCoreConfig() string {
 	return ""
 }
 
-func (x *LoadConfigReq) GetEnableNekorayConnections() bool {
+func (x *LoadConfigReq) GetEnableVloadConnections() bool {
 	if x != nil {
-		return x.EnableNekorayConnections
+		return x.EnableVloadConnections
 	}
 	return false
 }
@@ -738,10 +738,10 @@ func (x *UpdateResp) GetIsPreRelease() bool {
 }
 
 type ListConnectionsResp struct {
-	state                  protoimpl.MessageState `protogen:"open.v1"`
-	NekorayConnectionsJson string                 `protobuf:"bytes,1,opt,name=nekoray_connections_json,json=nekorayConnectionsJson,proto3" json:"nekoray_connections_json,omitempty"`
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	VloadConnectionsJson string                 `protobuf:"bytes,1,opt,name=vload_connections_json,json=vloadConnectionsJson,proto3" json:"vload_connections_json,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *ListConnectionsResp) Reset() {
@@ -774,9 +774,9 @@ func (*ListConnectionsResp) Descriptor() ([]byte, []int) {
 	return file_libcore_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *ListConnectionsResp) GetNekorayConnectionsJson() string {
+func (x *ListConnectionsResp) GetVloadConnectionsJson() string {
 	if x != nil {
-		return x.NekorayConnectionsJson
+		return x.VloadConnectionsJson
 	}
 	return ""
 }
@@ -842,11 +842,11 @@ const file_libcore_proto_rawDesc = "" +
 	"\bEmptyReq\"\v\n" +
 	"\tEmptyResp\"!\n" +
 	"\tErrorResp\x12\x14\n" +
-	"\x05error\x18\x01 \x01(\tR\x05error\"\x97\x01\n" +
+	"\x05error\x18\x01 \x01(\tR\x05error\"\x93\x01\n" +
 	"\rLoadConfigReq\x12\x1f\n" +
 	"\vcore_config\x18\x01 \x01(\tR\n" +
-	"coreConfig\x12<\n" +
-	"\x1aenable_nekoray_connections\x18\x02 \x01(\bR\x18enableNekorayConnections\x12'\n" +
+	"coreConfig\x128\n" +
+	"\x18enable_vload_connections\x18\x02 \x01(\bR\x16enableVloadConnections\x12'\n" +
 	"\x0fstats_outbounds\x18\x03 \x03(\tR\x0estatsOutbounds\"\xde\x03\n" +
 	"\aTestReq\x12%\n" +
 	"\x04mode\x18\x01 \x01(\x0e2\x11.libcore.TestModeR\x04mode\x12\x18\n" +
@@ -888,9 +888,9 @@ const file_libcore_proto_rawDesc = "" +
 	"\vrelease_url\x18\x04 \x01(\tR\n" +
 	"releaseUrl\x12!\n" +
 	"\frelease_note\x18\x05 \x01(\tR\vreleaseNote\x12$\n" +
-	"\x0eis_pre_release\x18\x06 \x01(\bR\fisPreRelease\"O\n" +
-	"\x13ListConnectionsResp\x128\n" +
-	"\x18nekoray_connections_json\x18\x01 \x01(\tR\x16nekorayConnectionsJson\"P\n" +
+	"\x0eis_pre_release\x18\x06 \x01(\bR\fisPreRelease\"K\n" +
+	"\x13ListConnectionsResp\x124\n" +
+	"\x16vload_connections_json\x18\x01 \x01(\tR\x14vloadConnectionsJson\"P\n" +
 	"\x1cUpdateNetworkAvailabilityReq\x12\x12\n" +
 	"\x04slot\x18\x01 \x01(\x05R\x04slot\x12\x1c\n" +
 	"\tavailable\x18\x02 \x01(\bR\tavailable*2\n" +

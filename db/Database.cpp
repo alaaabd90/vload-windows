@@ -6,7 +6,7 @@
 #include <QDir>
 #include <QColor>
 
-namespace NekoGui {
+namespace Vload {
 
     ProfileManager *profileManager = new ProfileManager();
 
@@ -77,9 +77,9 @@ namespace NekoGui {
         }
         // First setup
         if (groups.empty()) {
-            auto defaultGroup = NekoGui::ProfileManager::NewGroup();
+            auto defaultGroup = Vload::ProfileManager::NewGroup();
             defaultGroup->name = QObject::tr("Default");
-            NekoGui::profileManager->AddGroup(defaultGroup);
+            Vload::profileManager->AddGroup(defaultGroup);
         }
         //
         if (dataStore->flag_reorder) {
@@ -166,48 +166,48 @@ namespace NekoGui {
     //  新建的不给 fn 和 id
 
     std::shared_ptr<ProxyEntity> ProfileManager::NewProxyEntity(const QString &type) {
-        NekoGui_fmt::AbstractBean *bean;
+        Vload_fmt::AbstractBean *bean;
 
         if (type == "socks") {
-            bean = new NekoGui_fmt::SocksHttpBean(NekoGui_fmt::SocksHttpBean::type_Socks5);
+            bean = new Vload_fmt::SocksHttpBean(Vload_fmt::SocksHttpBean::type_Socks5);
         } else if (type == "http") {
-            bean = new NekoGui_fmt::SocksHttpBean(NekoGui_fmt::SocksHttpBean::type_HTTP);
+            bean = new Vload_fmt::SocksHttpBean(Vload_fmt::SocksHttpBean::type_HTTP);
         } else if (type == "shadowsocks") {
-            bean = new NekoGui_fmt::ShadowSocksBean();
+            bean = new Vload_fmt::ShadowSocksBean();
         } else if (type == "chain") {
-            bean = new NekoGui_fmt::ChainBean();
+            bean = new Vload_fmt::ChainBean();
         } else if (type == "loadbalance") {
-            bean = new NekoGui_fmt::LoadBalanceBean();
+            bean = new Vload_fmt::LoadBalanceBean();
         } else if (type == "vmess") {
-            bean = new NekoGui_fmt::VMessBean();
+            bean = new Vload_fmt::VMessBean();
         } else if (type == "trojan") {
-            bean = new NekoGui_fmt::TrojanVLESSBean(NekoGui_fmt::TrojanVLESSBean::proxy_Trojan);
+            bean = new Vload_fmt::TrojanVLESSBean(Vload_fmt::TrojanVLESSBean::proxy_Trojan);
         } else if (type == "vless") {
-            bean = new NekoGui_fmt::TrojanVLESSBean(NekoGui_fmt::TrojanVLESSBean::proxy_VLESS);
+            bean = new Vload_fmt::TrojanVLESSBean(Vload_fmt::TrojanVLESSBean::proxy_VLESS);
         } else if (type == "naive") {
-            bean = new NekoGui_fmt::NaiveBean();
+            bean = new Vload_fmt::NaiveBean();
         } else if (type == "hysteria2") {
-            bean = new NekoGui_fmt::QUICBean(NekoGui_fmt::QUICBean::proxy_Hysteria2);
+            bean = new Vload_fmt::QUICBean(Vload_fmt::QUICBean::proxy_Hysteria2);
         } else if (type == "tuic") {
-            bean = new NekoGui_fmt::QUICBean(NekoGui_fmt::QUICBean::proxy_TUIC);
+            bean = new Vload_fmt::QUICBean(Vload_fmt::QUICBean::proxy_TUIC);
         } else if (type == "custom") {
-            bean = new NekoGui_fmt::CustomBean();
+            bean = new Vload_fmt::CustomBean();
         } else if (type == "anytls") {
-            bean = new NekoGui_fmt::AnyTLSBean();
+            bean = new Vload_fmt::AnyTLSBean();
         } else if (type == "shadowtls") {
-            bean = new NekoGui_fmt::ShadowTLSBean();
+            bean = new Vload_fmt::ShadowTLSBean();
         } else if (type == "ssh") {
-            bean = new NekoGui_fmt::SSHBean();
+            bean = new Vload_fmt::SSHBean();
         } else if (type == "hysteria") {
-            bean = new NekoGui_fmt::HysteriaBean();
+            bean = new Vload_fmt::HysteriaBean();
         } else if (type == "wireguard") {
-            bean = new NekoGui_fmt::WireGuardBean();
+            bean = new Vload_fmt::WireGuardBean();
         } else if (type == "trojan-go") {
-            bean = new NekoGui_fmt::TrojanGoBean();
+            bean = new Vload_fmt::TrojanGoBean();
         } else if (type == "mieru") {
-            bean = new NekoGui_fmt::MieruBean();
+            bean = new Vload_fmt::MieruBean();
         } else {
-            bean = new NekoGui_fmt::AbstractBean(-114514);
+            bean = new Vload_fmt::AbstractBean(-114514);
         }
 
         auto ent = std::make_shared<ProxyEntity>(bean, type);
@@ -221,7 +221,7 @@ namespace NekoGui {
 
     // ProxyEntity
 
-    ProxyEntity::ProxyEntity(NekoGui_fmt::AbstractBean *bean, const QString &type_) {
+    ProxyEntity::ProxyEntity(Vload_fmt::AbstractBean *bean, const QString &type_) {
         if (type_ != nullptr) this->type = type_;
 
         _add(new configItem("type", &type, itemType::string));
@@ -233,7 +233,7 @@ namespace NekoGui {
 
         // 可以不关联 bean，只加载 ProxyEntity 的信息
         if (bean != nullptr) {
-            this->bean = std::shared_ptr<NekoGui_fmt::AbstractBean>(bean);
+            this->bean = std::shared_ptr<Vload_fmt::AbstractBean>(bean);
             // 有虚函数就要在这里 dynamic_cast
             _add(new configItem("bean", dynamic_cast<JsonStore *>(bean), itemType::jsonStore));
             _add(new configItem("traffic", dynamic_cast<JsonStore *>(traffic_data.get()), itemType::jsonStore));
@@ -408,4 +408,4 @@ namespace NekoGui {
         }
     }
 
-} // namespace NekoGui
+} // namespace Vload

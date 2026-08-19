@@ -3,17 +3,17 @@
 #include "ProxyEntity.hpp"
 #include "sys/ExternalProcess.hpp"
 
-namespace NekoGui {
+namespace Vload {
     class BuildConfigResult {
     public:
         QString error;
         QJsonObject coreConfig;
 
-        QList<std::shared_ptr<NekoGui_traffic::TrafficData>> outboundStats; // all, but not including "bypass" "block"
-        std::shared_ptr<NekoGui_traffic::TrafficData> outboundStat;         // main
+        QList<std::shared_ptr<Vload_traffic::TrafficData>> outboundStats; // all, but not including "bypass" "block"
+        std::shared_ptr<Vload_traffic::TrafficData> outboundStat;         // main
         QStringList ignoreConnTag;
 
-        std::list<std::shared_ptr<NekoGui_fmt::ExternalBuildResult>> extRs;
+        std::list<std::shared_ptr<Vload_fmt::ExternalBuildResult>> extRs;
     };
 
     class BuildConfigStatus {
@@ -68,4 +68,4 @@ namespace NekoGui {
     QString WriteVPNSingBoxConfig();
 
     QString WriteVPNLinuxScript(const QString &configPath);
-} // namespace NekoGui
+} // namespace Vload

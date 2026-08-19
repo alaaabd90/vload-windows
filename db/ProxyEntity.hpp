@@ -1,10 +1,10 @@
 #pragma once
 
-#include "main/NekoGui.hpp"
+#include "main/Vload.hpp"
 #include "db/traffic/TrafficData.hpp"
 #include "fmt/AbstractBean.hpp"
 
-namespace NekoGui_fmt {
+namespace Vload_fmt {
     class SocksHttpBean;
 
     class ShadowSocksBean;
@@ -36,9 +36,9 @@ namespace NekoGui_fmt {
     class TrojanGoBean;
 
     class MieruBean;
-}; // namespace NekoGui_fmt
+}; // namespace Vload_fmt
 
-namespace NekoGui {
+namespace Vload {
     class ProxyEntity : public JsonStore {
     public:
         QString type;
@@ -47,79 +47,79 @@ namespace NekoGui {
         int gid = 0;
         int latency = 0;
         bool lockedImport = false; // imported from a .vloadp locked profile - suppress type/address, block editing
-        std::shared_ptr<NekoGui_fmt::AbstractBean> bean;
-        std::shared_ptr<NekoGui_traffic::TrafficData> traffic_data = std::make_shared<NekoGui_traffic::TrafficData>("");
+        std::shared_ptr<Vload_fmt::AbstractBean> bean;
+        std::shared_ptr<Vload_traffic::TrafficData> traffic_data = std::make_shared<Vload_traffic::TrafficData>("");
 
         QString full_test_report;
 
-        ProxyEntity(NekoGui_fmt::AbstractBean *bean, const QString &type_);
+        ProxyEntity(Vload_fmt::AbstractBean *bean, const QString &type_);
 
         [[nodiscard]] QString DisplayLatency() const;
 
         [[nodiscard]] QColor DisplayLatencyColor() const;
 
-        [[nodiscard]] NekoGui_fmt::ChainBean *ChainBean() const {
-            return (NekoGui_fmt::ChainBean *) bean.get();
+        [[nodiscard]] Vload_fmt::ChainBean *ChainBean() const {
+            return (Vload_fmt::ChainBean *) bean.get();
         };
 
-        [[nodiscard]] NekoGui_fmt::LoadBalanceBean *LoadBalanceBean() const {
-            return (NekoGui_fmt::LoadBalanceBean *) bean.get();
+        [[nodiscard]] Vload_fmt::LoadBalanceBean *LoadBalanceBean() const {
+            return (Vload_fmt::LoadBalanceBean *) bean.get();
         };
 
-        [[nodiscard]] NekoGui_fmt::SocksHttpBean *SocksHTTPBean() const {
-            return (NekoGui_fmt::SocksHttpBean *) bean.get();
+        [[nodiscard]] Vload_fmt::SocksHttpBean *SocksHTTPBean() const {
+            return (Vload_fmt::SocksHttpBean *) bean.get();
         };
 
-        [[nodiscard]] NekoGui_fmt::ShadowSocksBean *ShadowSocksBean() const {
-            return (NekoGui_fmt::ShadowSocksBean *) bean.get();
+        [[nodiscard]] Vload_fmt::ShadowSocksBean *ShadowSocksBean() const {
+            return (Vload_fmt::ShadowSocksBean *) bean.get();
         };
 
-        [[nodiscard]] NekoGui_fmt::VMessBean *VMessBean() const {
-            return (NekoGui_fmt::VMessBean *) bean.get();
+        [[nodiscard]] Vload_fmt::VMessBean *VMessBean() const {
+            return (Vload_fmt::VMessBean *) bean.get();
         };
 
-        [[nodiscard]] NekoGui_fmt::TrojanVLESSBean *TrojanVLESSBean() const {
-            return (NekoGui_fmt::TrojanVLESSBean *) bean.get();
+        [[nodiscard]] Vload_fmt::TrojanVLESSBean *TrojanVLESSBean() const {
+            return (Vload_fmt::TrojanVLESSBean *) bean.get();
         };
 
-        [[nodiscard]] NekoGui_fmt::NaiveBean *NaiveBean() const {
-            return (NekoGui_fmt::NaiveBean *) bean.get();
+        [[nodiscard]] Vload_fmt::NaiveBean *NaiveBean() const {
+            return (Vload_fmt::NaiveBean *) bean.get();
         };
 
-        [[nodiscard]] NekoGui_fmt::QUICBean *QUICBean() const {
-            return (NekoGui_fmt::QUICBean *) bean.get();
+        [[nodiscard]] Vload_fmt::QUICBean *QUICBean() const {
+            return (Vload_fmt::QUICBean *) bean.get();
         };
 
-        [[nodiscard]] NekoGui_fmt::CustomBean *CustomBean() const {
-            return (NekoGui_fmt::CustomBean *) bean.get();
+        [[nodiscard]] Vload_fmt::CustomBean *CustomBean() const {
+            return (Vload_fmt::CustomBean *) bean.get();
         };
 
-        [[nodiscard]] NekoGui_fmt::AnyTLSBean *AnyTLSBean() const {
-            return (NekoGui_fmt::AnyTLSBean *) bean.get();
+        [[nodiscard]] Vload_fmt::AnyTLSBean *AnyTLSBean() const {
+            return (Vload_fmt::AnyTLSBean *) bean.get();
         };
 
-        [[nodiscard]] NekoGui_fmt::ShadowTLSBean *ShadowTLSBean() const {
-            return (NekoGui_fmt::ShadowTLSBean *) bean.get();
+        [[nodiscard]] Vload_fmt::ShadowTLSBean *ShadowTLSBean() const {
+            return (Vload_fmt::ShadowTLSBean *) bean.get();
         };
 
-        [[nodiscard]] NekoGui_fmt::SSHBean *SSHBean() const {
-            return (NekoGui_fmt::SSHBean *) bean.get();
+        [[nodiscard]] Vload_fmt::SSHBean *SSHBean() const {
+            return (Vload_fmt::SSHBean *) bean.get();
         };
 
-        [[nodiscard]] NekoGui_fmt::HysteriaBean *HysteriaBean() const {
-            return (NekoGui_fmt::HysteriaBean *) bean.get();
+        [[nodiscard]] Vload_fmt::HysteriaBean *HysteriaBean() const {
+            return (Vload_fmt::HysteriaBean *) bean.get();
         };
 
-        [[nodiscard]] NekoGui_fmt::WireGuardBean *WireGuardBean() const {
-            return (NekoGui_fmt::WireGuardBean *) bean.get();
+        [[nodiscard]] Vload_fmt::WireGuardBean *WireGuardBean() const {
+            return (Vload_fmt::WireGuardBean *) bean.get();
         };
 
-        [[nodiscard]] NekoGui_fmt::TrojanGoBean *TrojanGoBean() const {
-            return (NekoGui_fmt::TrojanGoBean *) bean.get();
+        [[nodiscard]] Vload_fmt::TrojanGoBean *TrojanGoBean() const {
+            return (Vload_fmt::TrojanGoBean *) bean.get();
         };
 
-        [[nodiscard]] NekoGui_fmt::MieruBean *MieruBean() const {
-            return (NekoGui_fmt::MieruBean *) bean.get();
+        [[nodiscard]] Vload_fmt::MieruBean *MieruBean() const {
+            return (Vload_fmt::MieruBean *) bean.get();
         };
     };
-} // namespace NekoGui
+} // namespace Vload

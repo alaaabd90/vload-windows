@@ -17,11 +17,11 @@ public:
 
     ~EditTrojanGo() override;
 
-    void onStart(std::shared_ptr<NekoGui::ProxyEntity> _ent) override;
+    void onStart(std::shared_ptr<Vload::ProxyEntity> _ent) override;
 
     bool onEnd() override;
 
 private:
     Ui::EditTrojanGo *ui;
-    std::shared_ptr<NekoGui::ProxyEntity> ent;
+    std::shared_ptr<Vload::ProxyEntity> ent;
 };

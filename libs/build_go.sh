@@ -21,7 +21,11 @@ pushd go/cmd/updater
 [ "$GOOS" == "linux" ] && mv $DEST/updater $DEST/launcher || true
 popd
 
-#### Go: nekobox_core ####
-pushd go/cmd/nekobox_core
-go build -v -o $DEST -trimpath -ldflags "-w -s -X github.com/matsuridayo/libneko/neko_common.Version_neko=$version_standalone" -tags "with_clash_api,with_gvisor,with_quic,with_wireguard,with_utls"
+#### Go: vload_core ####
+pushd go/cmd/vload_core
+# tfogo_checklinkname0 + -checklinkname=0: without these, tfo-go's Windows
+# dial path is a stub that returns ErrPlatformUnsupported for every TCP Fast
+# Open connection instead of falling back to a normal dial - see
+# database64128/tfo-go's README ("Windows support with Go 1.23 and later").
+go build -v -o $DEST -trimpath -ldflags "-w -s -checklinkname=0 -X github.com/matsuridayo/libneko/neko_common.Version_neko=$version_standalone" -tags "with_clash_api,with_gvisor,with_quic,with_wireguard,with_utls,tfogo_checklinkname0"
 popd

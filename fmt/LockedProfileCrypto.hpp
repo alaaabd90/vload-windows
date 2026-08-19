@@ -18,7 +18,7 @@
 // shorter, FINGERPRINT-dependent digest on both platforms) are recognized
 // and rejected with a clear error rather than misparsed against the new
 // fixed field width - see HwidManager.cpp for why that format changed.
-namespace NekoGui_fmt {
+namespace Vload_fmt {
     // Public so UI input validation (the "lock for another device" HWID
     // entry field) can check against the same length instead of a
     // hand-copied magic number that could drift out of sync with this.
@@ -41,4 +41,4 @@ namespace NekoGui_fmt {
     QByteArray LockedProfileCrypto_EncryptForHwid(const QString &plaintext, const QString &recipientHwid);
 
     LockedProfileDecryptResult LockedProfileCrypto_TryDecrypt(const QByteArray &content, const QString &deviceHwid);
-} // namespace NekoGui_fmt
+} // namespace Vload_fmt
