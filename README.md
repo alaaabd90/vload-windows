@@ -1,4 +1,4 @@
-# NekoBox For PC
+# vload
 
 Qt based cross-platform GUI proxy configuration manager (backend: sing-box)
 
@@ -14,35 +14,13 @@ Support Windows / Linux out of the box now.
 
 便携格式，无安装器。转到 Releases 下载预编译的二进制文件，解压后即可使用。
 
-[![GitHub All Releases](https://img.shields.io/github/downloads/Matsuridayo/nekoray/total?label=downloads-total&logo=github&style=flat-square)](https://github.com/Matsuridayo/nekoray/releases)
+[![GitHub All Releases](https://img.shields.io/github/downloads/alaaabd90/vload-windows/total?label=downloads-total&logo=github&style=flat-square)](https://github.com/alaaabd90/vload-windows/releases)
 
-[下载 / Download](https://github.com/Matsuridayo/nekoray/releases)
+[下载 / Download](https://github.com/alaaabd90/vload-windows/releases)
 
-[安装包的说明，如果你不知道要下载哪一个](https://github.com/MatsuriDayo/nekoray/wiki/Installation-package-description)
+## 更改记录 / Changelog
 
-### Package
-
-#### AUR
-
-- [nekoray](https://aur.archlinux.org/packages/nekoray)
-- [nekoray-git](https://aur.archlinux.org/packages/nekoray-git)
-
-#### archlinuxcn
-
-- [nekoray](https://github.com/archlinuxcn/repo/tree/master/archlinuxcn/nekoray)
-- [nekoray-git](https://github.com/archlinuxcn/repo/tree/master/archlinuxcn/nekoray-git)
-
-#### Scoop Extras
-
-`scoop install nekoray`
-
-## 更改记录 & 发布频道 / Changelog & Telegram Channel
-
-https://t.me/Matsuridayo
-
-## 项目主页 & 文档 / Homepage & Documents
-
-https://matsuridayo.github.io
+[GitHub Releases](https://github.com/alaaabd90/vload-windows/releases)
 
 ## 代理 / Proxy
 
@@ -78,25 +56,11 @@ https://matsuridayo.github.io
 
 ## 编译教程 / Compile Tutorial
 
-请看 [技术文档 / Technical documentation](https://github.com/MatsuriDayo/nekoray/tree/main/docs)
-
-## 捐助 / Donate
-
-如果这个项目对您有帮助，可以通过捐赠的方式帮助我们维持这个项目。
-
-捐赠满等额 50 USD 可以在「[捐赠榜](https://mtrdnt.pages.dev/donation_list)」显示头像，如果您未被添加到这里，欢迎联系我们补充。
-
-Donations of 50 USD or more can display your avatar on the [Donation List](https://mtrdnt.pages.dev/donation_list). If you are not added here, please contact us to add it.
-
-USDT TRC20
-
-`TRhnA7SXE5Sap5gSG3ijxRmdYFiD4KRhPs`
-
-XMR
-
-`49bwESYQjoRL3xmvTcjZKHEKaiGywjLYVQJMUv79bXonGiyDCs8AzE3KiGW2ytTybBCpWJUvov8SjZZEGg66a4e59GXa6k5`
+请看 [技术文档 / Technical documentation](https://github.com/alaaabd90/vload-windows/tree/main/docs)
 
 ## Credits
+
+vload is a rebrand/fork of [NekoBox For PC (nekoray)](https://github.com/MatsuriDayo/nekoray) by MatsuriDayo.
 
 Core:
 

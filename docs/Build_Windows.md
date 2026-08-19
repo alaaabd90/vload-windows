@@ -1,9 +1,9 @@
-在 Windows 下编译 Nekoray
+在 Windows 下编译 vload
 
 ### git clone 源码
 
 ```
-git clone https://github.com/MatsuriDayo/nekoray.git --recursive
+git clone https://github.com/alaaabd90/vload-windows.git --recursive
 ```
 
 ### 安装 Visual Studio
@@ -55,9 +55,9 @@ cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=D:/path/to/qt/5.15.
 ninja
 ```
 
-编译完成后得到 `nekobox.exe`
+编译完成后得到 `vload.exe`
 
-最后运行 `windeployqt nekobox.exe` 自动复制所需 DLL 等文件到当前目录
+最后运行 `windeployqt vload.exe` 自动复制所需 DLL 等文件到当前目录
 
 ### Go 部分编译
 

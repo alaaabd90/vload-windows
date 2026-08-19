@@ -1,9 +1,9 @@
-## 构建 nekobox_core
+## 构建 vload_core
 
 ### 目录结构
 
 ```
-  | nekoray
+  | vload
   |   go/cmd/*
   | sing-box-extra
   | sing-box

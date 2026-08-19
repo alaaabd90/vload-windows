@@ -1,9 +1,9 @@
-在 Linux 下编译 Nekoray
+在 Linux 下编译 vload
 
 ## git clone 源码
 
 ```
-git clone https://github.com/MatsuriDayo/nekoray.git --recursive
+git clone https://github.com/alaaabd90/vload-windows.git --recursive
 ```
 
 ## 简单编译法
@@ -22,9 +22,9 @@ cmake -GNinja ..
 ninja
 ```
 
-编译完成后得到 `nekobox`
+编译完成后得到 `vload`
 
-解压 Release 的压缩包，替换其中的 `nekobox`，删除 `launcher` 即可使用。
+解压 Release 的压缩包，替换其中的 `vload`，删除 `launcher` 即可使用。
 
 ## 复杂编译法
 
@@ -69,7 +69,7 @@ cmake -GNinja ..
 ninja
 ```
 
-编译完成后得到 `nekobox`
+编译完成后得到 `vload`
 
 ### Go 部分编译
 

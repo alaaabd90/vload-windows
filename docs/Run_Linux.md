@@ -5,47 +5,16 @@
 使用 Debian 系发行版时，推荐使用 .deb 包安装：
 
 ```shell
-sudo apt install ./nekoray-*-debian-x64.deb
+sudo apt install ./vload-*-debian-x64.deb
 ```
 
 安装完成后，桌面快捷方式启动自带参数 `-appdata`，如果想要直接启动并使用之前的配置，注意附带本参数。
-
-### Arch 系发行版
-
-使用 Arch 系发行版时，推荐从 ```aur``` 或 ```archlinuxcn``` 安装：
-
-#### AUR
-##### 最新稳定版
-
-```shell
-[yay/paru] -S nekoray
-```
-
-##### 最新 Git 版 (开发版)
-
-```shell
-[yay/paru] -S nekoray-git
-```
-
-#### archlinuxcn
-
-##### 最新稳定版
-
-```shell
-sudo pacman -S nekoray
-```
-
-##### 最新 Git 版 (开发版)
-
-```shell
-sudo pacman -S nekoray-git
-```
 
 ### 其他发行版
 
 下载 .zip 文件，解压到合适的路径，开箱即用。
 
-或下载 .AppImage，并使用 `chmod +x nekoray-*-AppImage-x64.AppImage` 给予可执行权限。
+或下载 .AppImage，并使用 `chmod +x vload-*-AppImage-x64.AppImage` 给予可执行权限。
 
 具体使用方法见下文。
 
@@ -58,7 +27,7 @@ sudo pacman -S nekoray-git
 
 目前 Release 便携包解压后，有两种使用方法：
 
-1. System: 若要使用系统的 Qt5 运行库，请执行 `./nekoray`
+1. System: 若要使用系统的 Qt5 运行库，请执行 `./vload`
 2. Bundle: 若要使用预编译的 Qt 运行库，请执行 `./launcher`
 
 ### Bundle
@@ -78,4 +47,4 @@ Ubuntu 22.04: `sudo apt install libxcb-xinerama0`
 
 要求：已安装主流的发行版和 xcb 桌面环境，已安装 Qt5.12 ~ Qt5.15 环境。
 
-运行： `./nekoray` 或 部分系统可双击打开。如果无法运行，建议使用 Bundle 版。
+运行： `./vload` 或 部分系统可双击打开。如果无法运行，建议使用 Bundle 版。
