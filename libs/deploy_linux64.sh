@@ -10,7 +10,7 @@ mkdir -p $DEST
 cp $BUILD/vload $DEST
 
 #### Download: prebuilt runtime ####
-curl -Lso usr.zip https://github.com/MatsuriDayo/vload_qt_runtime/releases/download/20220503/20230202-5.12.8-ubuntu20.04-linux64.zip
+curl -Lso usr.zip https://github.com/MatsuriDayo/nekoray_qt_runtime/releases/download/20220503/20230202-5.12.8-ubuntu20.04-linux64.zip
 unzip usr.zip
 mv usr $DEST
 
