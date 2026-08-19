@@ -694,12 +694,27 @@ namespace Vload {
         QJsonArray dnsServers;
         QJsonArray dnsRules;
 
+        // vload-android's ConfigBuilder.kt (autoDnsDomainStrategy) never
+        // leaves a DNS server's strategy empty: with IPv6 enabled it still
+        // defaults to prefer_ipv4, and with IPv6 disabled it forces
+        // ipv4_only. Windows left remote/direct_dns_strategy empty by
+        // default, so dns-remote/dns-direct raced A/AAAA with no preference
+        // - some domains got an IPv6 answer back that the actual path
+        // couldn't route, causing permanent per-site failures, and others
+        // flip-flopped between reloads depending on which record won the
+        // race. Apply the same auto-default here when the user hasn't
+        // explicitly overridden it in Route Settings.
+        auto autoDnsDomainStrategy = [&](const QString &configured) -> QString {
+            if (!configured.isEmpty()) return configured;
+            return dataStore->vpn_ipv6 ? "prefer_ipv4" : "ipv4_only";
+        };
+
         // Remote
         if (!status->forTest)
             dnsServers += QJsonObject{
                 {"tag", "dns-remote"},
                 {"address_resolver", "dns-local"},
-                {"strategy", dataStore->routing->remote_dns_strategy},
+                {"strategy", autoDnsDomainStrategy(dataStore->routing->remote_dns_strategy)},
                 {"address", dataStore->routing->remote_dns},
                 {"detour", status->dnsProxyTag.isEmpty() ? tagProxy : status->dnsProxyTag},
             };
@@ -708,7 +723,7 @@ namespace Vload {
         QJsonObject directObj{
             {"tag", "dns-direct"},
             {"address_resolver", "dns-local"},
-            {"strategy", dataStore->routing->direct_dns_strategy},
+            {"strategy", autoDnsDomainStrategy(dataStore->routing->direct_dns_strategy)},
             {"address", dataStore->routing->direct_dns},
             {"detour", "direct"},
         };
@@ -772,10 +787,15 @@ namespace Vload {
         }
 
         // fakedns rule
+        // vload-android's ConfigBuilder.kt sets disable_cache on this rule -
+        // without it, sing-box's normal DNS response cache sits in front of
+        // the fakeip allocator and can hand back a stale/inconsistent fake
+        // IP on the first lookup of a domain.
         if (dataStore->fake_dns && dataStore->vpn_internal_tun && dataStore->spmode_vpn && !status->forTest) {
             dnsRules += QJsonObject{
                 {"inbound", "tun-in"},
                 {"server", "dns-fake"},
+                {"disable_cache", true},
             };
         }
 
@@ -791,7 +811,19 @@ namespace Vload {
         // Routing
 
         // dns hijack
+        // vload-android's ConfigBuilder.kt adds BOTH a port:53 rule and a
+        // protocol:dns rule, unconditionally (not gated on sniff). The
+        // protocol:dns match only fires once sing-box's protocol sniffer has
+        // classified a packet as DNS, which itself depends on the "sniff"
+        // route action having already run for that connection - so with
+        // sniff disabled, or on an occasional first-packet sniff miss under
+        // gVisor/TUN timing, DNS silently stops being hijacked. The port:53
+        // rule is a protocol-independent fallback that always catches it.
         if (!status->forTest) {
+            status->routingRules += QJsonObject{
+                {"port", 53},
+                {"action", "hijack-dns"},
+            };
             status->routingRules += QJsonObject{
                 {"protocol", "dns"},
                 {"action", "hijack-dns"},
@@ -902,6 +934,23 @@ namespace Vload {
                 {"external_ui", "dashboard"},
             };
             experimentalObj["clash_api"] = clash_api;
+        }
+
+        // Without this, sing-box's fakeip reverse-mapping store is a small
+        // in-memory-only map with no protection against eviction races: a
+        // burst of connections (e.g. a page that opens dozens of subdomains
+        // at once) can evict a domain's fake-IP mapping before that
+        // connection finishes dialing, which is a FATAL error in sing-box's
+        // router (route.go: "missing fakeip record, try enable
+        // `experimental.cache_file`") that surfaces to the client as a
+        // refused/failed connection - retrying gets a fresh mapping and
+        // works. store_fakeip backs the store with the more robust cache
+        // file instead.
+        if (!status->forTest && dataStore->fake_dns) {
+            experimentalObj["cache_file"] = QJsonObject{
+                {"enabled", true},
+                {"store_fakeip", true},
+            };
         }
 
         if (!experimentalObj.isEmpty()) status->result->coreConfig.insert("experimental", experimentalObj);

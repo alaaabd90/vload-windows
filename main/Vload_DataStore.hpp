@@ -25,7 +25,11 @@ namespace Vload {
 
         // Misc
         QString domain_strategy = "AsIs";
-        QString outbound_domain_strategy = "AsIs";
+        // vload-android defaults this to "prefer_ipv4" unconditionally
+        // (SingBoxOptionsUtil.kt: domain_strategy_for_server) rather than
+        // leaving it unset, so the proxy outbound doesn't dual-stack race
+        // A/AAAA when dialing a domain destination.
+        QString outbound_domain_strategy = "prefer_ipv4";
         int sniffing_mode = SniffingMode::FOR_ROUTING;
 
         explicit Routing(int preset = 0);
