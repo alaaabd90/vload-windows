@@ -7,7 +7,13 @@ namespace Vload_fmt {
     public:
         QString network = "tcp";
         QString security = "";
-        QString packet_encoding = "";
+        // Empty used to mean "packet_encoding omitted", but sing-box's
+        // VLESS/VMess outbound can't encode a domain destination without
+        // xudp - and fakeip's reverse mapping means the outbound almost
+        // always receives a domain, not a resolved IP, for UDP/QUIC
+        // traffic. Matches vload-android's StandardV2RayBean fix: default
+        // new profiles to xudp instead of the broken empty mode.
+        QString packet_encoding = "xudp";
         // ws/http/grpc/tcp-http/httpupgrade
         QString path = "";
         QString host = "";
