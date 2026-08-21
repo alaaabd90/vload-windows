@@ -264,6 +264,31 @@ namespace Vload {
         };
         status->dnsProxyTag = "dns-proxy";
 
+        // Same two slots again, for QUIC (HTTP/3, sniffed via
+        // protocol="quic"). A QUIC connection is bound to one path for its
+        // whole life - the server only ever expects packets from the source
+        // IP (behind Connection ID) it negotiated the handshake with.
+        // sing-box gives UDP/443 a 30s idle NAT timeout (vs. the 5-minute
+        // default - see constant.ProtocolTimeouts), so a NAT-session
+        // rebuild mid-browse is routine, and "proxy" above's adaptive
+        // picker can legitimately hand that rebuilt flow to the *other*
+        // slot - a different exit IP mid-"conversation" from the server's
+        // point of view. That reads as a protocol violation to the server,
+        // not a migration, and surfaces client-side as
+        // ERR_QUIC_PROTOCOL_ERROR. Route sniffed QUIC through the same
+        // single-path-with-failover group as DNS instead - matches
+        // vload-android's ConfigBuilder.kt TAG_QUIC_PROXY fix.
+        status->outbounds += QJsonObject{
+            {"type", "weighted"},
+            {"tag", "quic-proxy"},
+            {"mode", "priority"},
+            {"outbounds", QJsonArray{
+                              QJsonObject{{"outbound", tagA}},
+                              QJsonObject{{"outbound", tagB}},
+                          }},
+        };
+        status->quicProxyTag = "quic-proxy";
+
         status->ent->traffic_data->id = status->ent->id;
         status->ent->traffic_data->tag = "proxy";
         status->result->outboundStat = status->ent->traffic_data;
@@ -827,6 +852,21 @@ namespace Vload {
             status->routingRules += QJsonObject{
                 {"protocol", "dns"},
                 {"action", "hijack-dns"},
+            };
+        }
+
+        // vload: route sniffed QUIC through the load-balance priority group
+        // instead of the adaptive dual-path one - see BuildLoadBalance's
+        // "quic-proxy" outbound comment for why. Must land after sniffRules
+        // in the final rule order (it does - this appends to
+        // status->routingRules, and sniffRules is placed first when the
+        // arrays are combined below) since protocol="quic" only matches
+        // once sniffing has actually classified the flow; harmless to add
+        // when sniffing is disabled, it just never matches.
+        if (!status->forTest && !status->quicProxyTag.isEmpty()) {
+            status->routingRules += QJsonObject{
+                {"protocol", "quic"},
+                {"outbound", status->quicProxyTag},
             };
         }
 

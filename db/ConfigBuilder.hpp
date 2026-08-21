@@ -52,6 +52,11 @@ namespace Vload {
         // failover, not both slots' answers mixed per query - see
         // BuildLoadBalance's own comment for why.
         QString dnsProxyTag;
+
+        // Same idea as dnsProxyTag, applied to QUIC (HTTP/3) traffic - see
+        // BuildLoadBalance's own comment on the "quic-proxy" outbound for
+        // why. Empty when the profile isn't load-balance.
+        QString quicProxyTag;
     };
 
     std::shared_ptr<BuildConfigResult> BuildConfig(const std::shared_ptr<ProxyEntity> &ent, bool forTest, bool forExport);
