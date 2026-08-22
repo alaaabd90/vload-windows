@@ -9,10 +9,12 @@ import (
 	"grpc_server/gen"
 
 	"github.com/matsuridayo/libneko/neko_common"
+	"github.com/matsuridayo/libneko/neko_log"
 	"github.com/matsuridayo/libneko/speedtest"
 	box "github.com/sagernet/sing-box"
 	"github.com/sagernet/sing-box/boxapi"
 	"github.com/sagernet/sing-box/include"
+	sblog "github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/protocol/group"
 	"github.com/sagernet/sing/service"
 
@@ -20,6 +22,28 @@ import (
 
 	"github.com/sagernet/sing-box/option"
 )
+
+// platformLogWriter routes sing-box's own internal logger (every
+// "outbound/weighted...", "inbound/tun...", connection open/close line -
+// everything the log_level setting is supposed to control) through the same
+// neko_log.LogWriter setupCore already wired to stdout+vload.log, instead of
+// its default of os.Stderr directly (see log.New in sing-box/log/log.go:
+// Options.Output=="" falls back to options.DefaultWriter, nil here, then
+// os.Stderr - a raw fd write that neko_log's log.SetOutput redirection,
+// which only intercepts the stdlib log package, never sees). Without this,
+// vload.log only ever had the one line grpc_server itself prints at
+// startup - every connection-level log sing-box produces was silently
+// going nowhere, leaving no way to diagnose a stalled/dropped session on
+// Windows the way vload-android's logcat capture can. Mirrors the Android
+// app's libcore/platform_box.go (boxPlatformLogWriterWrapper).
+type platformLogWriter struct{}
+
+func (platformLogWriter) WriteMessage(level sblog.Level, message string) {
+	if len(message) == 0 || message[len(message)-1] != '\n' {
+		message += "\n"
+	}
+	neko_log.LogWriter.Write([]byte(message))
+}
 
 // createBox builds a *box.Box from raw sing-box JSON config, using the
 // upstream sing-box "include" registries (everything cmd/sing-box itself
@@ -45,7 +69,11 @@ func createBox(configJSON []byte) (*box.Box, context.CancelFunc, error) {
 		return nil, nil, fmt.Errorf("decode config: %v", err)
 	}
 
-	instance, err := box.New(box.Options{Options: options, Context: ctx})
+	instance, err := box.New(box.Options{
+		Options:           options,
+		Context:           ctx,
+		PlatformLogWriter: platformLogWriter{},
+	})
 	if err != nil {
 		cancel()
 		return nil, nil, fmt.Errorf("create service: %v", err)
