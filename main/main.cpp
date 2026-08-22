@@ -199,6 +199,7 @@ int main(int argc, char* argv[]) {
     if (!isLoaded) {
         Vload::dataStore->routing->Save();
     }
+    Vload::Routing::MigrateDirectDnsDefault();
 
     // Translate
     QString locale;

@@ -260,6 +260,7 @@ namespace Vload {
         _add(new configItem("hk_spmenu", &hotkey_system_proxy_menu, itemType::string));
         _add(new configItem("fakedns", &fake_dns, itemType::boolean));
         _add(new configItem("active_routing", &active_routing, itemType::string));
+        _add(new configItem("migrated_direct_dns_default", &migrated_direct_dns_default, itemType::boolean));
         _add(new configItem("mw_size", &mw_size, itemType::string));
         _add(new configItem("conn_stat", &connection_statistics, itemType::boolean));
         _add(new configItem("vpn_impl", &vpn_implementation, itemType::integer));
@@ -364,6 +365,35 @@ namespace Vload {
     QStringList Routing::List() {
         QDir dr(ROUTES_PREFIX);
         return dr.entryList(QDir::Files);
+    }
+
+    void Routing::MigrateDirectDnsDefault() {
+        if (Vload::dataStore->migrated_direct_dns_default) return;
+        static const QString oldDefault = "https://doh.pub/dns-query";
+        static const QString newDefault = "https://1.1.1.1/dns-query";
+
+        // Already-loaded active profile: fix in place, no reload needed.
+        if (Vload::dataStore->routing != nullptr && Vload::dataStore->routing->direct_dns == oldDefault) {
+            Vload::dataStore->routing->direct_dns = newDefault;
+            Vload::dataStore->routing->Save();
+        }
+
+        // Every other saved routing profile - direct_dns is per-profile, so
+        // one still on the old default can be sitting unnoticed even if the
+        // currently active one already got fixed above (or never used it).
+        for (const auto &name: List()) {
+            if (name == Vload::dataStore->active_routing) continue;
+            Routing r;
+            r.fn = ROUTES_PREFIX + name;
+            if (!r.Load()) continue;
+            if (r.direct_dns == oldDefault) {
+                r.direct_dns = newDefault;
+                r.Save();
+            }
+        }
+
+        Vload::dataStore->migrated_direct_dns_default = true;
+        Vload::dataStore->Save();
     }
 
     bool Routing::SetToActive(const QString &name) {

@@ -14,9 +14,21 @@ namespace Vload {
         QString custom = "{\"rules\": []}";
 
         // DNS
+        // direct_dns previously defaulted to doh.pub (Tencent/DNSPod) -
+        // inherited from the upstream China-focused fork, and applies
+        // mainland China content filtering. Confirmed on vload-android via a
+        // captured session: dozens of ordinary Western services (Google
+        // services, YouTube, Play services, ad/tracker domains vload still
+        // needs to resolve even when blocking them) failed DNS resolution
+        // with HTTP 403 through the equivalent AliDNS default there. 1.1.1.1
+        // is a neutral, globally-reliable resolver; kept distinct from
+        // remote_dns's own default (dns.google) so the two DNS paths aren't
+        // one provider's outage away from failing together. See
+        // Routing::MigrateDirectDnsDefault for existing installs already
+        // persisting the old default.
         QString remote_dns = "https://dns.google/dns-query";
         QString remote_dns_strategy = "";
-        QString direct_dns = "https://doh.pub/dns-query";
+        QString direct_dns = "https://1.1.1.1/dns-query";
         QString direct_dns_strategy = "";
         bool dns_routing = true;
         bool use_dns_object = false;
@@ -39,6 +51,14 @@ namespace Vload {
         static QStringList List();
 
         static bool SetToActive(const QString &name);
+
+        // One-time fixup for every saved routing profile still sitting on
+        // the untouched doh.pub default (see direct_dns above) - a code
+        // default change alone doesn't reach a value already persisted to
+        // an existing install's routing JSON files. Guarded by
+        // DataStore::migrated_direct_dns_default; call once at startup
+        // after dataStore->routing is loaded.
+        static void MigrateDirectDnsDefault();
     };
 
     class ExtraCore : public JsonStore {
@@ -146,6 +166,7 @@ namespace Vload {
         // Routing
         QString custom_route_global = "{\"rules\": []}";
         QString active_routing = "Default";
+        bool migrated_direct_dns_default = false;
 
         // VPN
         bool fake_dns = false;
