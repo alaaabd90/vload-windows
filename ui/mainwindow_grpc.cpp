@@ -550,13 +550,27 @@ void MainWindow::CheckLoadBalanceNetworkAvailability() {
     int nowA = adapterUp(bean->slotAAdapter) ? 1 : 0;
     int nowB = adapterUp(bean->slotBAdapter) ? 1 : 0;
 
+    // UpdateNetworkAvailability above only affects which slot the picker is
+    // willing to choose for *new* connections; it does nothing about
+    // connections that were already open on this slot before its adapter
+    // changed underneath them. Without an explicit reset those just sit
+    // there broken (or stuck on a link that no longer exists) until the
+    // user manually reconnects - the same gap vload-android's
+    // VloadNetworkController closed with resetSlotConnections. Skip it on
+    // the very first push for a fresh box instance (lastA/lastB == -1):
+    // there's nothing to reset yet, and CloseMember would just no-op on an
+    // empty tracked-connections map anyway.
     if (nowA != lastA) {
+        bool firstPush = lastA == -1;
         lastA = nowA;
         defaultClient->UpdateNetworkAvailability(0, nowA == 1);
+        if (!firstPush) defaultClient->ResetSlotConnections(0);
     }
     if (nowB != lastB) {
+        bool firstPush = lastB == -1;
         lastB = nowB;
         defaultClient->UpdateNetworkAvailability(1, nowB == 1);
+        if (!firstPush) defaultClient->ResetSlotConnections(1);
     }
 #endif
 }

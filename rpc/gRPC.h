@@ -34,6 +34,8 @@ namespace Vload_rpc {
 
         void UpdateNetworkAvailability(int slot, bool available);
 
+        void ResetSlotConnections(int slot);
+
     private:
         std::function<std::unique_ptr<QtGrpc::Http2GrpcChannelPrivate>()> make_grpc_channel;
         std::unique_ptr<QtGrpc::Http2GrpcChannelPrivate> default_grpc_channel;

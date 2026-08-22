@@ -291,6 +291,14 @@ namespace Vload_rpc {
         default_grpc_channel->Call("UpdateNetworkAvailability", request, &reply, 500);
     }
 
+    void Client::ResetSlotConnections(int slot) {
+        libcore::ResetSlotConnectionsReq request;
+        request.set_slot(slot);
+
+        libcore::ResetSlotConnectionsResp reply;
+        default_grpc_channel->Call("ResetSlotConnections", request, &reply, 500);
+    }
+
     libcore::UpdateResp Client::Update(bool *rpcOK, const libcore::UpdateReq &request) {
         libcore::UpdateResp reply;
         auto status = default_grpc_channel->Call("Update", request, &reply);

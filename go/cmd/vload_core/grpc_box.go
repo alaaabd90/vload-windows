@@ -223,3 +223,13 @@ func (s *server) UpdateNetworkAvailability(ctx context.Context, in *gen.UpdateNe
 	weighted.UpdateAvailability(int(in.Slot), in.Available)
 	return
 }
+
+func (s *server) ResetSlotConnections(ctx context.Context, in *gen.ResetSlotConnectionsReq) (out *gen.ResetSlotConnectionsResp, _ error) {
+	out = &gen.ResetSlotConnectionsResp{Closed: -1}
+	if weighted == nil {
+		out.Error = "not running a load-balance profile"
+		return
+	}
+	out.Closed = int32(weighted.CloseMember(int(in.Slot)))
+	return
+}

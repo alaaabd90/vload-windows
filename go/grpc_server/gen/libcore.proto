@@ -18,6 +18,15 @@ service LibcoreService {
   // bound to drops or recovers. No-op if the running config isn't using a
   // weighted (vload load-balance) outbound.
   rpc UpdateNetworkAvailability(UpdateNetworkAvailabilityReq) returns (ErrorResp) {}
+  // vload: force-close every connection currently open on one load-balance
+  // slot (0 or 1) - use when that slot's physical network adapter actually
+  // changed underneath it (went down, or came back as a different link),
+  // so whatever was using those connections fails fast and retries through
+  // the picker instead of hanging on a socket that will never produce
+  // another byte. Narrower than a full restart: the other, unaffected slot
+  // is left untouched. No-op if the running config isn't using a weighted
+  // (vload load-balance) outbound.
+  rpc ResetSlotConnections(ResetSlotConnectionsReq) returns (ResetSlotConnectionsResp) {}
 }
 
 message EmptyReq {}
@@ -102,4 +111,16 @@ message ListConnectionsResp {
 message UpdateNetworkAvailabilityReq {
   int32 slot = 1;
   bool available = 2;
+}
+
+message ResetSlotConnectionsReq {
+  int32 slot = 1;
+}
+
+message ResetSlotConnectionsResp {
+  string error = 1;
+  // How many connections were closed. Negative means the running config
+  // isn't using a weighted (vload load-balance) outbound - there was
+  // nothing slot-scoped to do.
+  int32 closed = 2;
 }
