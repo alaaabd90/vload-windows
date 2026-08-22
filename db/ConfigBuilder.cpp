@@ -622,6 +622,16 @@ namespace Vload {
             inboundObj["mtu"] = dataStore->vpn_mtu;
             inboundObj["stack"] = Preset::SingBox::VpnImplementation.value(dataStore->vpn_implementation);
             inboundObj["strict_route"] = dataStore->vpn_strict_route;
+            // "TAP" (see Preset::SingBox::VpnImplementation) is the 4th
+            // Stack combo entry, not a real sing-box stack value - it maps
+            // to gVisor for actual packet processing and separately sets
+            // this flag so the Go core backs the interface with a real
+            // TAP-Windows adapter instead of WinTun. No-op on non-Windows
+            // builds (the Go side gates on runtime.GOOS=="windows"), so
+            // selecting it there just harmlessly runs plain gVisor/WinTun.
+            if (dataStore->vpn_implementation == Preset::SingBox::VpnImplementationTapIndex) {
+                inboundObj["windows_tap_adapter"] = true;
+            }
             // vload: inet4_address/inet6_address merged into "address" in
             // sing-box 1.10.0, removed in 1.12.0 (see migration.md#1100)
             QJsonArray tunAddress{"172.19.0.1/28"};

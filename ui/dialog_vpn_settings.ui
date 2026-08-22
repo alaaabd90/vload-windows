@@ -53,6 +53,11 @@
           <string notr="true">System</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string notr="true">TAP</string>
+         </property>
+        </item>
        </widget>
       </item>
       <item>
